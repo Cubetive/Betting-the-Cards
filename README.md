@@ -2,10 +2,10 @@
 Git repository for the web game *"Betting the Cards"*, by **Cubetive**, **F.U.C.C**, and **keithPlayzStuff**
 
 ## About Us
-Hello
+F.U.C.C is poggers
 
 ## The game
-Blah blah blah
+basically hs but henry stickmin (wtf their acronyms are the same! :flushed:
 
 ## Why am I doing this, this is privated anyway
-UwU
+furries are banned btw
