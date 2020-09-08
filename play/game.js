@@ -23,3 +23,4 @@ function addCard(el, cardData) {
 }
 
 addCard(friendlyCardArea, {weed: "420"});
+// funny number!!!!
