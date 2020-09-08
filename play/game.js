@@ -14,4 +14,4 @@ function addCard(el, cardData) {
   el.appendChild(newCard);
 }
 
-addCard({weed: "420"});
+addCard(friendlyCardArea, {weed: "420"});
