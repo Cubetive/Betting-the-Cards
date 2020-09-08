@@ -8,10 +8,9 @@ function addCard(el, cardData) {
   newCard.setAttribute("height", cardSize);
 
   const cardBorder = document.createElementNS("http://www.w3.org/2000/svg", "rectangle");
-  cardBorder.setAttribute("width", cardSize);
-  cardBorder.setAttribute("height", cardSize);
-  cardBorder.setAttribute("fill-opacity", 0);
-  cardBorder.setAttribute("stroke", "black");
+  cardBorder.setAttribute("width", "100%");
+  cardBorder.setAttribute("height", "100%");
+  cardBorder.setAttribute("style", "fill:lightgrey;stroke:black;stroke-width:3");
   newCard.appendChild(cardBorder);
   
   const dummyCardText = document.createElementNS("http://www.w3.org/2000/svg", "text");
