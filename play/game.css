@@ -1,1 +1,9 @@
+#title {
+  align-content: center;
+  margin-top: auto;
+}
 
+div {
+  display: block;
+  margin: auto;
+}
