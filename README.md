@@ -11,8 +11,11 @@ We're a random dev team who makes a card game inspired from Undercards about the
 Hello, I'm Cubetive! A student who has passion in Technology and has intentions to learn Computer Science and work in the industry. I'm also an indie developer that has developed some small games, published on itch.io. I have a Youtube channel, too, so if you want to support me, subscribe to my channel! :D
 
 [Youtube](https://www.youtube.com/channel/UCQi-Knlut7ssVLSH6gGTHfA "Cubetive")
+
 [Twitter](https://twitter.com/CubetiveVN "@CubetiveVN")
+
 [Twitch](https://www.twitch.tv/cubetivetwitch "I may stream sometimes")
+
 [Itch](https://cubetive.itch.io "My indie games page")
 
 ## keithPlayzStuff (programmer)
