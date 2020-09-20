@@ -49,6 +49,7 @@ function addCard(el, cardData) {
   const name = document.createElementNS("http://www.w3.org/2000/svg", "text");
   name.setAttribute("x", "50%");
   name.setAttribute("y", (STANDARD_CARD_HEIGHT / 2) + (STANDARD_CARD_HEIGHT / 4));
+  name.setAttribute("transform", "translateX(-50%)")
   name.textContent = cardData.name;
   newCard.appendChild(name);
   el.appendChild(newCard);

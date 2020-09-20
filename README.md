@@ -21,9 +21,6 @@ Hello, I'm Cubetive! A student who has passion in Technology and has intentions 
 ## keithPlayzStuff (programmer)
 <!-- Add your info here keith -->
 
-## Crystal Flames (Web designer)
-<!-- Add your info here Crystal Flames -->
-
 # The game
 As mentioned before, you're expecting this to be a card game like Undercards, but with Henry Stickmin characters in it!
 **The game is still in early developement!**
