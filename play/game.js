@@ -5,7 +5,17 @@
   * Owner: F.U.C.C, Cubetive
   * Licensed under the MIT License
 */
+// Initalisation
+const gamearea = document.getElementById("gamearea");
 
+let game = new PIXI.Application({
+  width: 1440,
+  height: 675,
+  antialias: true,
+  transparent: false,
+  resolution: 1
+});
+gamearea.appendChild(game.view);
 // Player variables
 var friendly = {
   name: "Cubetive",
@@ -28,3 +38,10 @@ var enemy = {
 }
 
 // Main
+function setup() {
+
+}
+
+function gameloop() {
+  
+}
