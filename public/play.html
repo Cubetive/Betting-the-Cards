@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Betting the cards</title>
+  <script defer src="play/game.js"></script>
+  <script src="play/pixi.min.js"></script>
+  <link rel="stylesheet" href="play/game.css"></link>
+</head>
+<body>
+  <script defer type="text/javascript">
+    let type = "WebGL"
+    if(!PIXI.utils.isWebGLSupported()){
+      type = "canvas"
+    }
+    PIXI.utils.sayHello(type)
+  </script>
+    <script type="text/javascript">
+
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", "newGameState", true);
+  xhttp.onreadystatechange =  function() {
+    if (this.readyState == 4 && this.status == 200) {
+    }
+  }
+  xhttp.setRequestHeader('Content-Type', 'application/json');
+  xhttp.send(JSON.stringify({a:1}));
+    </script>
+  <header id="logo">
+    <h1 id="title">Betting the Cards</h1>
+  </header>
+  <div id="gamearea" class="gamearea">
+    <!-- Outline -->
+  </div>
+  <div id="gameover" class="gameover">
+  </div>
+</body>
+</html>

@@ -21,6 +21,7 @@
   "homepage": "https://github.com/Cubetive/Betting-the-Cards#readme",
   "dependencies": {
     "express": "^4.17.1",
+    "hbs": "^4.1.1",
     "node.js": "0.0.1-security"
   }
 }
