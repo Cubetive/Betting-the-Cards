@@ -4,6 +4,9 @@ Git repository for the web game *"Betting the Cards"*, by **Cubetive**, **F.U.C.
 # About Us
 We're a random dev team who makes a card game inspired from Undercards about the most popular and favourite series, Henry Stickmin. We are a team of (currently) 4 people: F.U.C.C, Cubetive, keithPlayzStuff, and Crystal Flames
 
+# Our Discord Server
+https://discord.gg/72hxqTf
+
 ## F.U.C.C (Team leader)
 I"m F.U.C.C! I'm a perfectly normal 9-grade student currently without any life problems who is a beginner programmer with leading skills. I also like gameing, which is my primary hobby. I can draw simple art well. I sometimes post on my [Youtube channel](https://www.youtube.com/channel/UCNuONlelPahjCErOUYbNDKw) when I feel like it.
 
