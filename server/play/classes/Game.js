@@ -11,18 +11,19 @@ class Game {
     let save = this.whosTurnNext
     this.whosTurnNext = this.whosTurnCurrent
     this.whosTurnCurrent = save
+    this.applyAuraEffects()
   }
   applyAuraEffects(){
     for(let i=0;i<7;i++){
-      if(this.game.players[0].slots[i]!=null){
-        this.game.players[0].slots[i].applyAuraEffects(this)
+      if(this.players[0].slots[i]!=null){
+        this.players[0].slots[i].applyAuraEffects(this)
       }
     }
-      for(let i=0;i<7;i++){
-        if(this.game.players[1].slots[i]!=null){
-          this.game.players[1].slots[i].applyAuraEffects(this)
-        }
+    for(let i=0;i<7;i++){
+      if(this.players[1].slots[i]!=null){
+        this.players[1].slots[i].applyAuraEffects(this)
       }
+    }
   }
 }
 module.exports = {Game}

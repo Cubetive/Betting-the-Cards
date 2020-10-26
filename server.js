@@ -1,6 +1,7 @@
 const express = require("express")
 const hbs = require('hbs')
 const Game = require('./server/play/classes/Game.js').Game
+const tests = require('./server/runtests.js')
 const bodyParser = require("body-parser");
 var nextGameState = 0
 var app = express();
@@ -85,3 +86,5 @@ app.get("/hell",(request,rep)=>{
   rep.send({whoCanLeaveHell:["not you puny mortal"],isSatanAllPowerful:true,doIdeserverToBeInHell:"who cares",IsInHell:"yes",temperature:"500 degress celsius",colour:"red"})
 })
 app.listen(8081)
+//do not uncomment this when using nodemon or you will get stuck in an infinte loop
+//tests.runDBTests()

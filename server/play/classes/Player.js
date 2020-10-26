@@ -1,10 +1,12 @@
 const Card = require('./Card.js').Card
 const Game = require('./Game.js').Game
+const util = require('../../util.js')
 class Player {
   constructor(deck,id,game){
     for(let i=0;i<deck.length;i++){
       deck[i] = new Card(deck[i],id,game)
     }
+    util.shuffle(deck)
     this.deck = deck
     this.id=id
     this.hp = 30
