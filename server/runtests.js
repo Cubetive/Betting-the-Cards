@@ -1,7 +1,9 @@
 const util = require('./util.js')
-const db = require('./accounts/databaseInteraction.js')
-const runDBTests = ()=>{
-  db.newPlayer("Steve")
-  console.log(db.retrieve())
+const runDBTests = (db)=>{
+  db.newPlayer("Steve","password")
+  db.incXP("Steve",1500)
+  console.log(JSON.stringify(db))
+  db.incXP("Steve",7000)
+  console.log(JSON.stringify(db))
 }
 module.exports = {runDBTests}

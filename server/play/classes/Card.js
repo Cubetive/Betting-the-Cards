@@ -1,16 +1,17 @@
 const cardList = require('../data/cards.js').cardList
 const util = require('../../util.js')
 class Card {
-  constructor(name,team){
+  constructor(name,team,slot){
     this.name = name
     this.team = team
+    this.slot = slot
     this.statsSwapped = false
     this.outgoingAuras = []
     this.ingoingAuras = []
     this.enter = []
     this.fail = []
-    this.turnStart = []
-    this.turnEnd = []
+    this.turnStartEffects = []
+    this.turnEndEffects = []
     for(const [key,value] of Object.entries(cardList[name])){
       this[key]=value
     }
@@ -19,25 +20,63 @@ class Card {
     //base means the base stats of the card. Outgoing means after all auras
     this.outgoingAttack = this.baseAttack
     this.outgoingHP = this.realHP
+    this.attacking = false
     this.canAttack = false
     this.outgoingKeywords = this.baseKeywords
     this.outgoingText = this.baseText
     this.outgoingStatsSwapped = this.statsSwapped
   }
+  attack(game,target,override){
+    if(!override && !this.canAttack){
+      return
+    }
+    this.attacking = true
+    game.applyAuraEffects()
+    if(target.fail!=undefined){
+      //it's a monster
+      target.takeDamage(this,this.outgoingAttack,game)
+      this.takeDamage(target,target.outgoingAttack,game)
+    }else{
+      //it's a player
+      target.takeDamage(this,this.outgoingAttack,game)
+    }
+    this.attacking = false
+    this.canAttack = false
+    game.applyAuraEffects()
+  }
   takeDamage(source,amount,game){
     this.realHP-=amount
     game.applyAuraEffects()
   }
-  turnStart(){
+  checkDeath(game){
+    if(this.outgoingHP<=0){
+      game.players[team].slots[slot] = null
+      game.applyAuraEffects()
+      for(let i=0;i<this.fail.length;i++){
+        this.fail[i](game)
+        game.applyAuraEffects()
+      }
+    }
+  }
+  turnStart(game){
     if(this.frozen){
       this.frozen = false
       this.canAttack = false
     }else{
       this.canAttack = true
     }
-    this.turnStartEffects()
+    for(let i=0;i<this.turnStartEffects.length;i++){
+      this.turnStartEffects[i](game)
+      game.applyAuraEffects()
+    }
   }
-  onSummon(){
+  turnEnd(game){
+    for(let i=0;i<this.turnEndEffects.length;i++){
+      this.turnEndEffects[i](game)
+      game.applyAuraEffects()
+    }
+  }
+  onSummon(game,played){
     if(this.keywords.include('Charge')){
       this.canAttack = true
     }
@@ -166,6 +205,7 @@ class Card {
     }
     //alter card text to match keywords
     this.outgoingText = this.outgoingKeywords.join(', ')+'\n'+this.baseText
+    this.checkDeath(game)
   }
 }
 module.exports = {Card}

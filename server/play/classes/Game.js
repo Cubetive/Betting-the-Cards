@@ -6,8 +6,8 @@ class Game {
     this.whosTurnCurrent = 0
   }
   nextTurn(){
-    this.players[this.whosTurnCurrent].endTurn()
-    this.players[this.whosTurnNext].startTurn()
+    this.players[this.whosTurnCurrent].endTurn(this)
+    this.players[this.whosTurnNext].startTurn(this)
     let save = this.whosTurnNext
     this.whosTurnNext = this.whosTurnCurrent
     this.whosTurnCurrent = save
@@ -24,6 +24,10 @@ class Game {
         this.players[1].slots[i].applyAuraEffects(this)
       }
     }
+  }
+  win(team){
+    //Win code here
+    
   }
 }
 module.exports = {Game}

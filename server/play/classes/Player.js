@@ -20,7 +20,7 @@ class Player {
     this.slots = [null,null,null,null,null,null,null]
     this.draw(3)
   }
-  startTurn(){
+  startTurn(game){
     this.mana = this.manaNext
     if(this.manaNext<10){
       this.manaNext++
@@ -28,7 +28,14 @@ class Player {
     this.draw(1)
     for(let i=0;i<7;i++){
       if(this.slots[i]!=null){
-        this.slots[i].turnStart()
+        this.slots[i].turnStart(game)
+      }
+    }
+  }
+  endTurn(game){
+    for(let i=0;i<7;i++){
+      if(this.slots[i]!=null){
+        this.slots[i].turnEnd(game)
       }
     }
   }
@@ -52,21 +59,22 @@ class Player {
       return
     }
     let card = this.hand[cardPos]
-    if(this.mana>card.cost){
+    if(this.mana<card.cost){
       return;
     }
     this.mana-=card.cost
     this.slots[slotPos] = card
     this.hand.splice(cardPos,0)
     game.applyAuraEffects()
-    this.slots[slotPos].onPlay(aura)
+    this.slots[slotPos].onSummon(game,true)
     game.applyAuraEffects()
   }
-  takeDamage(amount){
+  takeDamage(source,amount,game){
     this.hp-=amount
-  }
-  endTurn(){
-
+    if(this.hp<=0){
+      game.win(+!this.id)
+    }
+    game.updateAuraEffects()
   }
   getPublicInfo(){
     return {
