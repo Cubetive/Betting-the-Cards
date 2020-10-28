@@ -25,7 +25,13 @@ const cardList = {
         }
       }
     }],
-    rarity:0,
+    rarity:1,
+  },
+  "packTest":{
+    rarity:2,
+  },
+  "packTest2":{
+    rarity:3,
   },
 }
 module.exports = {cardList}

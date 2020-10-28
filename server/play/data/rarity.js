@@ -3,18 +3,26 @@ const rarityList = {
   0:{
     maxPerDeck:4,
     maxPerCollection:4,
+    dustAmount:10,
+    craftCost:40,
   },
   1:{
     maxPerDeck:3,
     maxPerCollection:3,
+    dustAmount:40,
+    craftCost:100,
   },
   2:{
     maxPerDeck:2,
     maxPerCollection:2,
+    dustAmount:100,
+    craftCost:400,
   },
   3:{
     maxPerDeck:1,
     maxPerCollection:1,
+    dustAmount:400,
+    craftCost:1600,
   },
 }
-module.exports = {cardList}
+module.exports = {rarityList}

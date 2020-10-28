@@ -1,3 +1,4 @@
+const cardList = require('./play/data/cards.js').cardList
 const stripDuplicates = function(array){
   let newArray = []
   for(let i=0;i<array.length;i++){
@@ -25,4 +26,30 @@ function shuffle(array) {
 
   return array;
 }
-module.exports = {stripDuplicates,shuffle}
+const weightedRandomChance = (choices)=>{
+  let values = Object.entries(choices)
+  let totalWeight = 0
+  for(let i=0;i<values.length;i++){
+    totalWeight+=values[i][1]
+  }
+  let chosen = Math.random()*totalWeight
+  let soFar = 0
+  for(let i=0;i<values.length;i++){
+    soFar+=values[i][1]
+    if(soFar>chosen){
+      return values[i][0]
+    }
+  }
+}
+const getRandomCards = (amount,requirements)=>{
+  let entries = Object.entries(cardList)
+  let possibilities = []
+  for(let i=0;i<entries.length;i++){
+    if(requirements(entries[i][1])){
+      possibilities.push(entries[i][0])
+    }
+  }
+  shuffle(possibilities)
+  return possibilities.splice(0,amount)
+}
+module.exports = {stripDuplicates,shuffle,weightedRandomChance,getRandomCards}
