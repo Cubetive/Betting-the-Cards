@@ -22,5 +22,8 @@ Hello, I'm Cubetive! A student who has passion in Technology and has intentions 
 As mentioned before, you're expecting this to be a card game like Undercards, but with Henry Stickmin characters in it!
 **The game is still in early developement!**
 
+# Our Discord Server
+https://discord.gg/72hxqTf
+
 # Contact us
 <!-- Add contact information here for people -->
