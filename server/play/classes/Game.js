@@ -1,9 +1,21 @@
 const Player = require('./Player.js').Player
 class Game {
-  constructor(deck1,deck2){
-    this.players = [new Player(deck1,0),new Player(deck2,1)]
+  constructor(){
+    this.players = [new Player(0),new Player(1)]
     this.whosTurnNext = 1
     this.whosTurnCurrent = 0
+    this.started = false
+  }
+  addPlayer(socket,deck){
+    if(this.started){
+      return
+    }
+    for(let i=0;i<this.players.length;i++){
+      if(!this.players[i].webSocket){
+        this.players[i].beginGame(socket,deck)
+        break
+      }
+    }
   }
   nextTurn(){
     this.players[this.whosTurnCurrent].endTurn(this)
@@ -27,7 +39,7 @@ class Game {
   }
   win(team){
     //Win code here
-    
+
   }
 }
 module.exports = {Game}

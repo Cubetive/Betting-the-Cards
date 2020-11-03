@@ -33,5 +33,8 @@ const cardList = {
   "packTest2":{
     rarity:3,
   },
+  "packTest3":{
+    rarity:0,
+  },
 }
 module.exports = {cardList}

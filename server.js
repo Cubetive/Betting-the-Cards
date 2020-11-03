@@ -4,6 +4,7 @@ const Game = require('./server/play/classes/Game.js').Game
 const tests = require('./server/runtests.js')
 const db = require('./server/accounts/databaseInteraction.js')
 const bodyParser = require("body-parser");
+const ws = require('ws');
 var nextGameState = 0
 var app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -12,41 +13,33 @@ app.use(express.static(__dirname + "/public"))
 app.set('view engine','hbs')
 gameStates = {}
 //handle requests
-app.post("/sendVote",(request,response)=>{
-  gameStates[request.body.gameID].players[request.body.vote.id].vote = request.body.vote.choice
-  gameStates[request.body.gameID].votes.push(request.body.vote.choice)
-  response.send("yes")
-})
-app.post("/sendMessage",(request,response)=>{
-  gameStates[request.body.gameID].messages.push(request.body.message)
-  response.send("yes")
-})
-app.post("/addPlayer",(request,response)=>{
-  gameStates[request.body.gameID].players.push(request.body.player)
-  gameStates[request.body.gameID].names.push(request.body.player.name)
-  response.send("yes")
-})
-app.post("/clearChoices",(request,response)=>{
-  gameStates[request.body.gameID].players[request.body.id].choices=[]
-  response.send("yes")
-})
-app.post("/newGameState",(request,response)=>{
-  gameStates[nextGameState] = new Game(["Stickman BOi","Stickman BOi","Stickman BOi","Stickman BOi"],["Stickman BOi","Stickman BOi","Stickman BOi","Stickman BOi"])
-  nextGameState++
-  response.send("yes")
-})
-app.post("/nextTurn",(request,response)=>{
-  gameStates[request.body.gameID].nextTurn()
-  response.send("yes")
-  nextGameState++
-})
-app.get("/gameStates",(request,response)=>{
-  console.log(gameStates)
-  response.send(JSON.stringify(gameStates))
-})
-app.get("/hell",(request,rep)=>{
-  rep.send({whoCanLeaveHell:["not you puny mortal"],isSatanAllPowerful:true,doIdeserverToBeInHell:"who cares",IsInHell:"yes",temperature:"500 degress celsius",colour:"red"})
-})
+gameStates[nextGameState] = new Game([],[])
+nextGameState++
 app.listen(8081)
 Database = new db.Database()
 tests.runDBTests(Database)
+
+//websocket
+const wsServer = new ws.Server({ noServer: true });
+wsServer.on('connection', socket => {
+  socket.on('message', message => {
+    if(socket.connected){
+      return
+    }
+    try {
+      data = JSON.parse(message)
+      if(data.type=="joinGame" && data.id!=undefined && gameStates[data.id] && !gameStates[data.id].started){
+        gameStates[data.id].addPlayer(socket,data.deck)
+        socket.connected = true
+      }
+    } catch (e) {
+      console.log(e)
+    }
+  });
+});
+const server = app.listen(3000);
+server.on('upgrade', (request, socket, head) => {
+  wsServer.handleUpgrade(request, socket, head, socket => {
+    wsServer.emit('connection', socket, request);
+  });
+});

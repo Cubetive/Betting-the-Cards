@@ -45,13 +45,3 @@ function setup() {
 function gameloop() {
 
 }
-function nextTurn(){
-  var xhttp = new XMLHttpRequest();
-  xhttp.open("POST", "nextTurn", true);
-  xhttp.onreadystatechange =  function() {
-    if (this.readyState == 4 && this.status == 200) {
-    }
-  }
-  xhttp.setRequestHeader('Content-Type', 'application/json');
-  xhttp.send(JSON.stringify({gameID:0}));
-}

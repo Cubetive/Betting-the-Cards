@@ -114,7 +114,7 @@ class Database{
   }
   autoDisenchant(name){
     let player = this.data.players[name]
-    if(player==undefined || player.money<100){
+    if(player==undefined){
       return
     }
     let entries = Object.entries(player.cards)

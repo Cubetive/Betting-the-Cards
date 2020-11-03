@@ -2,23 +2,35 @@ const Card = require('./Card.js').Card
 const Game = require('./Game.js').Game
 const util = require('../../util.js')
 class Player {
-  constructor(deck,id,game){
-    for(let i=0;i<deck.length;i++){
-      deck[i] = new Card(deck[i],id,game)
-    }
-    util.shuffle(deck)
-    this.deck = deck
+  constructor(id){
     this.id=id
     this.hp = 30
     this.mana = 0
     this.manaNext = 1
     this.hand = []
+    this.actionsToSend = []
     this.fatigueNext = 1
+    this.webSocket = false
     this.numOfCardsMax = 10
     this.name = "TrainingDummy"
     this.hpMax = 30
     this.slots = [null,null,null,null,null,null,null]
+  }
+  beginGame(socket,deck){
+    this.webSocket = socket
+    this.deck = deck
+    for(let i=0;i<this.deck.length;i++){
+      this.deck[i] = new Card(deck[i],this.id)
+    }
+    util.shuffle(deck)
     this.draw(3)
+    this.webSocket.on('message',(message)=>{this.handleSocketMessage(message)})
+  }
+  handleSocketMessage(message){
+    this.webSocket.send(message)
+  }
+  sendActions(){
+
   }
   startTurn(game){
     this.mana = this.manaNext

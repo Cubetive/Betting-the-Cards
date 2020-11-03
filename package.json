@@ -22,7 +22,7 @@
   "dependencies": {
     "express": "^4.17.1",
     "hbs": "^4.1.1",
-    "node-static": "^0.7.11",
-    "node.js": "0.0.1-security"
+    "node.js": "0.0.1-security",
+    "ws": "^7.3.1"
   }
 }

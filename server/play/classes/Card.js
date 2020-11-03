@@ -1,10 +1,10 @@
 const cardList = require('../data/cards.js').cardList
 const util = require('../../util.js')
 class Card {
-  constructor(name,team,slot){
+  constructor(name,team){
     this.name = name
     this.team = team
-    this.slot = slot
+    this.slot = null
     this.statsSwapped = false
     this.outgoingAuras = []
     this.ingoingAuras = []
@@ -50,7 +50,7 @@ class Card {
   }
   checkDeath(game){
     if(this.outgoingHP<=0){
-      game.players[team].slots[slot] = null
+      game.players[team].slots[this.slot] = null
       game.applyAuraEffects()
       for(let i=0;i<this.fail.length;i++){
         this.fail[i](game)
@@ -76,10 +76,11 @@ class Card {
       game.applyAuraEffects()
     }
   }
-  onSummon(game,played){
+  onSummon(game,played,slot){
     if(this.keywords.include('Charge')){
       this.canAttack = true
     }
+    this.slot = slot
     this.canAttack = false
   }
   applyAuraEffects(game){
