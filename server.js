@@ -19,6 +19,9 @@ app.listen(8081)
 Database = new db.Database()
 tests.runDBTests(Database)
 
+app.get("/gameStates",(request,response)=>{
+  response.send(gameStates)
+})
 //websocket
 const wsServer = new ws.Server({ noServer: true });
 wsServer.on('connection', socket => {

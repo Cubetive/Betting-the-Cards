@@ -1,12 +1,13 @@
 const cardList = require('../data/cards.js').cardList
 const util = require('../../util.js')
 class Card {
-  constructor(name,team){
+  constructor(name,team,game){
     this.name = name
     this.team = team
     this.slot = null
     this.statsSwapped = false
     this.outgoingAuras = []
+    this.game = game
     this.ingoingAuras = []
     this.enter = []
     this.fail = []
@@ -26,39 +27,46 @@ class Card {
     this.outgoingText = this.baseText
     this.outgoingStatsSwapped = this.statsSwapped
   }
-  attack(game,target,override){
+  getNonCircularCopy(){
+    let game = this.game
+    this.game = undefined
+    let toReturn = JSON.parse(JSON.stringify(this))
+    this.game = game
+    return toReturn
+  }
+  attack(target,override){
     if(!override && !this.canAttack){
       return
     }
     this.attacking = true
-    game.applyAuraEffects()
+    this.game.applyAuraEffects()
     if(target.fail!=undefined){
       //it's a monster
-      target.takeDamage(this,this.outgoingAttack,game)
-      this.takeDamage(target,target.outgoingAttack,game)
+      target.takeDamage(this,this.outgoingAttack,this.game)
+      this.takeDamage(target,target.outgoingAttack,this.game)
     }else{
       //it's a player
-      target.takeDamage(this,this.outgoingAttack,game)
+      target.takeDamage(this,this.outgoingAttack,this.game)
     }
     this.attacking = false
     this.canAttack = false
-    game.applyAuraEffects()
+    this.game.applyAuraEffects()
   }
-  takeDamage(source,amount,game){
+  takeDamage(source,amount){
     this.realHP-=amount
-    game.applyAuraEffects()
+    this.game.applyAuraEffects()
   }
-  checkDeath(game){
+  checkDeath(){
     if(this.outgoingHP<=0){
-      game.players[team].slots[this.slot] = null
-      game.applyAuraEffects()
+      this.game.players[team].slots[this.slot] = null
+      this.game.applyAuraEffects()
       for(let i=0;i<this.fail.length;i++){
-        this.fail[i](game)
-        game.applyAuraEffects()
+        this.fail[i](this.game)
+        this.game.applyAuraEffects()
       }
     }
   }
-  turnStart(game){
+  turnStart(){
     if(this.frozen){
       this.frozen = false
       this.canAttack = false
@@ -66,33 +74,33 @@ class Card {
       this.canAttack = true
     }
     for(let i=0;i<this.turnStartEffects.length;i++){
-      this.turnStartEffects[i](game)
-      game.applyAuraEffects()
+      this.turnStartEffects[i](this.game)
+      this.game.applyAuraEffects()
     }
   }
-  turnEnd(game){
+  turnEnd(){
     for(let i=0;i<this.turnEndEffects.length;i++){
-      this.turnEndEffects[i](game)
-      game.applyAuraEffects()
+      this.turnEndEffects[i](this.game)
+      this.game.applyAuraEffects()
     }
   }
-  onSummon(game,played,slot){
+  onSummon(played,slot){
     if(this.keywords.include('Charge')){
       this.canAttack = true
     }
     this.slot = slot
     this.canAttack = false
   }
-  applyAuraEffects(game){
+  applyAuraEffects(){
     this.outgoingHP = this.realHP
     this.outgoingKeywords = this.baseKeywords
     this.outgoingAttack = this.baseAttack
     this.outgoingStatsSwapped = this.statsSwapped
     //set stats auras
     for(let i=0;i<7;i++){
-      if(game.players[+!this.team].slots[i]!=null && game.players[+!this.team].slots[i]!=this){
-        for(let j=0;j<game.players[+!this.team].slots[i].outgoingAuras.length;j++){
-          let setStats = game.players[+!this.team].slots[i].outgoingAuras[j](this).setStats
+      if(this.game.players[+!this.team].slots[i]!=null && this.game.players[+!this.team].slots[i]!=this){
+        for(let j=0;j<this.game.players[+!this.team].slots[i].outgoingAuras.length;j++){
+          let setStats = this.game.players[+!this.team].slots[i].outgoingAuras[j](this).setStats
           if(setStats!=undefined){
             if(setStats.attack != undefined){
               this.outgoingAttack = setStats.attack
@@ -105,9 +113,9 @@ class Card {
       }
     }
     for(let i=0;i<7;i++){
-      if(game.players[this.team].slots[i]!=null && game.players[this.team].slots[i]!=this){
-        for(let j=0;j<game.players[this.team].slots[i].outgoingAuras.length;j++){
-          let setStats = game.players[this.team].slots[i].outgoingAuras[j](this).setStats
+      if(this.game.players[this.team].slots[i]!=null && this.game.players[this.team].slots[i]!=this){
+        for(let j=0;j<this.game.players[this.team].slots[i].outgoingAuras.length;j++){
+          let setStats = this.game.players[this.team].slots[i].outgoingAuras[j](this).setStats
           if(setStats!=undefined){
             if(setStats.attack != undefined){
               this.outgoingAttack = setStats.attack
@@ -132,9 +140,9 @@ class Card {
     }
     // modify stats auras and keyword auras
     for(let i=0;i<7;i++){
-      if(game.players[+!this.team].slots[i]!=null && game.players[+!this.team].slots[i]!=this){
-        for(let j=0;j<game.players[+!this.team].slots[i].outgoingAuras.length;j++){
-          let aura = game.players[+!this.team].slots[i].outgoingAuras[j](this)
+      if(this.game.players[+!this.team].slots[i]!=null && this.game.players[+!this.team].slots[i]!=this){
+        for(let j=0;j<this.game.players[+!this.team].slots[i].outgoingAuras.length;j++){
+          let aura = this.game.players[+!this.team].slots[i].outgoingAuras[j](this)
           if(aura.stats.attack != undefined){
             this.outgoingAttack += aura.stats.attack
           }
@@ -148,9 +156,9 @@ class Card {
       }
     }
     for(let i=0;i<7;i++){
-      if(game.players[this.team].slots[i]!=null && game.players[this.team].slots[i]!=this){
-        for(let j=0;j<game.players[this.team].slots[i].outgoingAuras.length;j++){
-          let aura = game.players[this.team].slots[i].outgoingAuras[j](this)
+      if(this.game.players[this.team].slots[i]!=null && this.game.players[this.team].slots[i]!=this){
+        for(let j=0;j<this.game.players[this.team].slots[i].outgoingAuras.length;j++){
+          let aura = this.game.players[this.team].slots[i].outgoingAuras[j](this)
           if(aura.stats.attack != undefined){
             this.outgoingAttack += aura.stats.attack
           }
@@ -179,9 +187,9 @@ class Card {
     }
     //swap stats auras
     for(let i=0;i<7;i++){
-      if(game.players[+!this.team].slots[i]!=null && game.players[+!this.team].slots[i]!=this){
-        for(let j=0;j<game.players[+!this.team].slots[i].outgoingAuras.length;j++){
-          let aura = game.players[+!this.team].slots[i].outgoingAuras[j](this)
+      if(this.game.players[+!this.team].slots[i]!=null && this.game.players[+!this.team].slots[i]!=this){
+        for(let j=0;j<this.game.players[+!this.team].slots[i].outgoingAuras.length;j++){
+          let aura = this.game.players[+!this.team].slots[i].outgoingAuras[j](this)
           if(aura.swapStats!=undefined){
             this.outgoingStatsSwapped = this.outgoingStatsSwapped==!aura.swapStats
           }
@@ -189,9 +197,9 @@ class Card {
       }
     }
     for(let i=0;i<7;i++){
-      if(game.players[this.team].slots[i]!=null && game.players[this.team].slots[i]!=this){
-        for(let j=0;j<game.players[this.team].slots[i].outgoingAuras.length;j++){
-          let aura = game.players[this.team].slots[i].outgoingAuras[j](this)
+      if(this.game.players[this.team].slots[i]!=null && this.game.players[this.team].slots[i]!=this){
+        for(let j=0;j<this.game.players[this.team].slots[i].outgoingAuras.length;j++){
+          let aura = this.game.players[this.team].slots[i].outgoingAuras[j](this)
           if(aura.swapStats!=undefined){
             this.outgoingStatsSwapped = this.outgoingStatsSwapped==!aura.swapStats
           }
@@ -206,7 +214,7 @@ class Card {
     }
     //alter card text to match keywords
     this.outgoingText = this.outgoingKeywords.join(', ')+'\n'+this.baseText
-    this.checkDeath(game)
+    this.checkDeath(this.game)
   }
 }
 module.exports = {Card}

@@ -1,0 +1,7 @@
+1) Download the code.
+2) Open a command prompt.
+3) Install node
+4) Navigate to the downloaded file.
+5) type node server.js
+5) Open the website 127.0.0.1:8081 twice.
+6) Enjoy

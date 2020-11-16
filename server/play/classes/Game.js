@@ -1,10 +1,15 @@
 const Player = require('./Player.js').Player
 class Game {
   constructor(){
-    this.players = [new Player(0),new Player(1)]
+    this.players = [new Player(0,this),new Player(1,this)]
     this.whosTurnNext = 1
     this.whosTurnCurrent = 0
     this.started = false
+  }
+  sendAnimations(){
+    for(let i=0;i<this.players.length;i++){
+      this.players[i].sendAnimations()
+    }
   }
   addPlayer(socket,deck){
     if(this.started){
@@ -15,6 +20,11 @@ class Game {
         this.players[i].beginGame(socket,deck)
         break
       }
+    }
+    if(this.players[1].webSocket){
+      this.started = true
+      this.sendAnimations()
+      this.players[0].manaNext = 2
     }
   }
   nextTurn(){

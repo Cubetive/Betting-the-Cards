@@ -9,13 +9,13 @@ const cardList = {
     imageLink:"",
     rarity:0,
   },
-  "aura test":{
-    baseHP:5,
-    baseAttack:5,
+  "auraTest":{
+    baseHP:2,
+    baseAttack:3,
     baseKeywords:[""],
-    cost:5,
+    cost:4,
     type:"character",
-    baseText:"",
+    baseText:"Other monsters have +2/-1",
     imageLink:"",
     outgoingAuras: [(card)=>{
       return {
