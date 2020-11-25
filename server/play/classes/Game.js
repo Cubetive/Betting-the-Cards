@@ -5,6 +5,7 @@ class Game {
     this.whosTurnNext = 1
     this.whosTurnCurrent = 0
     this.started = false
+    this.ended = false
   }
   sendAnimations(){
     for(let i=0;i<this.players.length;i++){
@@ -23,8 +24,8 @@ class Game {
     }
     if(this.players[1].webSocket){
       this.started = true
+      this.players[0].startTurn()
       this.sendAnimations()
-      this.players[0].manaNext = 2
     }
   }
   nextTurn(){
@@ -49,7 +50,11 @@ class Game {
   }
   win(team){
     //Win code here
-
+    this.ended = true
+    this.players[team].addAnimation("win",{},1000)
+    this.players[team].animationsLocked = true
+    this.players[+!team].addAnimation("lose",{},1000)
+    this.players[+!team].animationsLocked = true
   }
 }
 module.exports = {Game}

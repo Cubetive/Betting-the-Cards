@@ -7,12 +7,11 @@ exampleSocket.onopen = function (event) {
   exampleSocket.send(JSON.stringify({type:'joinGame',id:JSON.parse(localStorage.gameID),deck:JSON.parse(localStorage.deck)}));
 };
 exampleSocket.onmessage = function(message){
-  data = JSON.parse(message.data)
-  if(data.length>0){
-    handleNextAnimation(data)
-  }
+  let data = JSON.parse(message.data)
+  console.log(message,data)
+  deHighlightCards()
+  handleNextAnimation(JSON.parse(JSON.stringify(data.animationList)),data.cardData)
 }
 sendThroughWebSocket = function(message){
-  console.log(message)
   exampleSocket.send(message);
 }
