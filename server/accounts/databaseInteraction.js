@@ -55,6 +55,8 @@ class Database {
         }
 
         this.playerList.push(name)
+        this.setDust(name, 10000000000)
+        this.craftAllCards(name)
         return true
     }
     incXP(name, amount) {
