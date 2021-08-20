@@ -1,0 +1,3 @@
+C:\Users\Talon Howitt\Documents\GitHub\Betting-the-Cards\obj\Debug\BettingTheCards.njsprojAssemblyReference.cache
+C:\Users\Talon Howitt\Documents\GitHub\Betting-the-Cards\obj\Debug\BettingTheCards.njsproj.CoreCompileInputs.cache
+C:\Users\Talon Howitt\Documents\GitHub\Betting-the-Cards\bin\Microsoft.NodejsTools.WebRole.dll

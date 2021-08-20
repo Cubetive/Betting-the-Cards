@@ -1,28 +1,27 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
-  <title>Betting the cards</title>
-  <script defer src="play/game.js"></script>
-  <script defer src="play/animations.js"></script>
-  <script src="play/pixi.min.js"></script>
-  <script defer src="play/websocket.js"></script>
-  <link rel="stylesheet" href="play/game.css"></link>
+  <title>Hollow Cards - queue</title>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" type="text/css" href="css/play.css"></link>
+  <link rel="stylesheet" type="text/css" href="css/global.css"></link>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script defer src="navBar.js"></script>
 </head>
 <body>
-  <script defer type="text/javascript">
-    let type = "WebGL"
-    if(!PIXI.utils.isWebGLSupported()){
-      type = "canvas"
-    }
-    PIXI.utils.sayHello(type)
-  </script>
-  <header id="logo">
-    <h1 id="title">Betting the Cards</h1>
+  <header>
+    <h1 id="title">Hollow Cards</h1>
   </header>
-  <div id="gamearea" class="gamearea">
-    <!-- Outline -->
+  <div id="navBar">
   </div>
-  <div id="gameover" class="gameover">
+  <div id = "app">
+    <select id="deckChooser" v-model="curDeckID" class = "deckChooser">
+      <option v-for="(deck,i) in decks"
+      :value="i">{{deck.name}}</option>
+    </select>
+    <button v-on:click='enterQueue()'>Enter Queue</button>
   </div>
+  <script src="play/playWebsocket.js"></script>
+  <script src="play/play.js"></script>
 </body>
 </html>

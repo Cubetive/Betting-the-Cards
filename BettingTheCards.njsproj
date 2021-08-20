@@ -1,0 +1,145 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{9661870c-1800-4094-8a69-ac56b745f306}</ProjectGuid>
+    <ProjectHome>.</ProjectHome>
+    <ProjectView>ShowAllFiles</ProjectView>
+    <StartupFile>index.js</StartupFile>
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <ProjectTypeGuids>{3AF33F2E-1136-4D97-BBB7-1795711AC8B8};{349c5851-65df-11da-9384-00065b846f21};{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}</ProjectTypeGuids>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">16.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
+  <ItemGroup>
+    <Content Include="howToRun.txt" />
+    <Content Include="rules.txt" />
+    <Content Include="server\play\classes\Listener.js">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="todo.txt" />
+    <Content Include="data.json" />
+    <Content Include="package-lock.json" />
+    <Content Include="package.json" />
+    <Content Include="README.md" />
+    <Content Include="index.js" />
+    <Content Include="public\404.html" />
+    <Content Include="public\decks.html" />
+    <Content Include="public\gameVue.html" />
+    <Content Include="public\game.html" />
+    <Content Include="public\index.html" />
+    <Content Include="public\login.html" />
+    <Content Include="public\play.html" />
+    <Content Include="public\register.html" />
+    <Content Include="public\navBar.js" />
+    <Content Include="server\runtests.js" />
+    <Content Include="server\util.js" />
+    <Content Include="public\css\decks.css" />
+    <Content Include="public\css\game.css" />
+    <Content Include="public\css\global.css" />
+    <Content Include="public\css\main.css" />
+    <Content Include="public\css\play.css" />
+    <Content Include="public\decks\decks.js" />
+    <Content Include="public\decks\websocketDeck.js" />
+    <Content Include="public\game\animations.js" />
+    <Content Include="public\game\animationsVue.js" />
+    <Content Include="public\game\game.js" />
+    <Content Include="public\game\gameVue.js" />
+    <Content Include="public\game\gameWebsocket.js" />
+    <Content Include="public\game\gameWebsocketVue.js" />
+    <Content Include="public\game\pixi.min.js" />
+    <Content Include="public\game\spriteList.js" />
+    <Content Include="public\images\AttackOverlay.png" />
+    <Content Include="public\images\AvatarFrame.png" />
+    <Content Include="public\images\AvatarFrameAttacked.png" />
+    <Content Include="public\images\AvatarFrameTargetable.png" />
+    <Content Include="public\images\BaseAvatar.png" />
+    <Content Include="public\images\CardFrame.png" />
+    <Content Include="public\images\CardFrameCollection.png" />
+    <Content Include="public\images\CardFrameDying.png" />
+    <Content Include="public\images\CardFrameHighlighted.png" />
+    <Content Include="public\images\CardFrameSelected.png" />
+    <Content Include="public\images\CardFrameTargetable.png" />
+    <Content Include="public\images\DefendOverlay.png" />
+    <Content Include="public\images\EndTurn.png" />
+    <Content Include="public\images\Faction0.png" />
+    <Content Include="public\images\SpellCardFrame.png" />
+    <Content Include="public\images\SpellCardFrameCollection.png" />
+    <Content Include="public\images\SpellCardFrameHighlighted.png" />
+    <Content Include="public\index\saveServer.js" />
+    <Content Include="public\login\login.js" />
+    <Content Include="public\play\play.js" />
+    <Content Include="public\play\playWebsocket.js" />
+    <Content Include="public\register\register.js" />
+    <Content Include="server\accounts\databaseInteraction.js" />
+    <Content Include="server\play\classes\Card.js" />
+    <Content Include="server\play\classes\Game.js" />
+    <Content Include="server\play\classes\ListenerReceiver.js" />
+    <Content Include="server\play\classes\ListenerEmitter.js" />
+    <Content Include="server\play\classes\Player.js" />
+    <Content Include="server\play\data\cards.js" />
+    <Content Include="server\play\data\keywords.js" />
+    <Content Include="server\play\data\rarity.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="BettingTheCards" />
+    <Folder Include="public" />
+    <Folder Include="public\css" />
+    <Folder Include="public\decks" />
+    <Folder Include="public\game" />
+    <Folder Include="public\images" />
+    <Folder Include="public\index" />
+    <Folder Include="public\login" />
+    <Folder Include="public\play" />
+    <Folder Include="public\register" />
+    <Folder Include="server" />
+    <Folder Include="server\accounts" />
+    <Folder Include="server\play" />
+    <Folder Include="server\play\classes" />
+    <Folder Include="server\play\data" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsToolsV2.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>False</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>0</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:48022/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>True</UseCustomServer>
+          <CustomServerUrl>http://localhost:1337</CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}" User="">
+        <WebProjectProperties>
+          <StartPageUrl>
+          </StartPageUrl>
+          <StartAction>CurrentPage</StartAction>
+          <AspNetDebugging>True</AspNetDebugging>
+          <SilverlightDebugging>False</SilverlightDebugging>
+          <NativeDebugging>False</NativeDebugging>
+          <SQLDebugging>False</SQLDebugging>
+          <ExternalProgram>
+          </ExternalProgram>
+          <StartExternalURL>
+          </StartExternalURL>
+          <StartCmdLineArguments>
+          </StartCmdLineArguments>
+          <StartWorkingDirectory>
+          </StartWorkingDirectory>
+          <EnableENC>False</EnableENC>
+          <AlwaysStartWebServerOnDebug>False</AlwaysStartWebServerOnDebug>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

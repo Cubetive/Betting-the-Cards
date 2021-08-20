@@ -13,14 +13,14 @@ const rarityList = {
     craftCost:100,
   },
   2:{
-    maxPerDeck:2,
-    maxPerCollection:2,
+    maxPerDeck:3,
+    maxPerCollection:3,
     dustAmount:100,
     craftCost:400,
   },
   3:{
-    maxPerDeck:1,
-    maxPerCollection:1,
+    maxPerDeck:3,
+    maxPerCollection:3,
     dustAmount:400,
     craftCost:1600,
   },

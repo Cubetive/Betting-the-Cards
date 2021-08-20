@@ -1,0 +1,28 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <title>Hollow Cards - register</title>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" type="text/css" href="css/register.css"></link>
+  <link rel="stylesheet" type="text/css" href="css/global.css"></link>
+  <script defer src="register/register.js"></script>
+  <script defer src="navBar.js"></script>
+</head>
+<body>
+  <header>
+    <h1 id="title">Hollow Cards</h1>
+  </header>
+  <div id="navBar">
+  </div>
+  <form>
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username"><br>
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password"><br>
+    <label for="cpassword">Confirm password:</label>
+    <input type="password" id="cpassword" name="cpassword"><br>
+  </form>
+  <button onclick="submitRegister()">Submit</button>
+  <div id="registerResults"></div>
+</body>
+</html>

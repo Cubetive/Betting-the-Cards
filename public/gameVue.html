@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hollow Cards - Game</title>
+    <script defer src="game/gameWebsocketVue.js"></script>
+    <script defer src="game/spriteList.js"></script>
+    <script defer src="game/gameVue.js"></script>
+    <script defer src="game/animationsVue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="game/cardComponentGame.js"></script>
+    <script src="game/pixi.min.js"></script>
+    <link rel="stylesheet" href="css/game.css">
+    <link rel="stylesheet" href="css/global.css">
+</head>
+<body>
+    <script defer type="text/javascript">
+    </script>
+    <header id="logo">
+        <h1 id="title">Hollow Cards</h1>
+    </header>
+    <div id="app">
+        <div id="gamearea" class="gamearea" v-if="gameEnded" style="text-align:center; font-size:50px;color:white;">
+            <br /><br /><br />
+            {{won?"You win":"You lose"}}<br /><br />
+            <button style="font-size:50px;" v-on:click ="leaveGame()">
+                Return home.
+            </button>
+        </div>
+        <div id="gamearea" class="gamearea" v-else>
+            <span class="enemyStats">
+                <div class="enemyName stat">
+                    {{enemyData.name}}
+                </div>
+                <div class="enemySoul stat">
+                    Enemy Soul: {{enemyData.soul}}
+                </div>
+                <div class="enemyHP stat">
+                    Enemy HP: {{enemyData.HP}}
+                </div>
+                <div class="enemyGeo stat">
+                    Enemy Geo: {{enemyData.geo}}
+                </div>
+                <div class="enemyHand stat">
+                    Enemy Cards in Hand: {{enemyData.cardsInHand}}/10
+                </div>
+                <div class="enemyPlayer">
+                    <img class="enemyFrame"
+                         :src="getAvatarFrameSprite(enemyAvatarFrameState)"
+                         :style="{'cursor':enemyAvatarFrameState=='normal'?'default':'pointer'}" />
+                    <img class="enemyAvatar" src="images/BaseAvatar.png"
+                         :style="{'cursor':enemyAvatarFrameState=='normal'?'default':'pointer'}"
+                         v-on:click="playerSelected(+!ID)" />
+                </div>
+            </span>
+            <table class="gameSlots">
+                <tr>
+                    <td v-for="(card,i) in enemySlots">
+                        <card v-if="card!=null"
+                              :style='{position:"absolute",left:calcBoardX(i),top:"3px"}'
+                              :card='card'
+                              :opacity='1'
+                              :get-card-data='getCardData'
+                              :get-keyword-data='getKeywordData'
+                              :pos='i'
+                              :zone='"enemySlots"'
+                              :key='i'
+                              :active="true"
+                              v-on:card-selected="cardSelected"
+                              v-on:set-overlay-text='setOverlayText'></card>
+                        <img v-if="shouldDisplayOverlay('attackOverlay', false, i)"
+                             :style='{position:"absolute",left:calcBoardX(i),top:"3px"}'
+                             class="boardOverlay"
+                             src="images/AttackOverlay.png" />
+                        <img v-if="shouldDisplayOverlay('defendOverlay', false, i)"
+                             :style='{position:"absolute",left:calcBoardX(i),top:"3px"}'
+                             class="boardOverlay"
+                             src="images/DefendOverlay.png" />
+                    </td>
+                </tr>
+                <tr>
+                    <td v-for="(card,i) in allySlots">
+                        <card v-if="card!=null"
+                              :style='{position:"absolute",left:calcBoardX(i),top:"200px"}'
+                              :card='card'
+                              :opacity='1'
+                              :get-card-data='getCardData'
+                              :zone='"allySlots"'
+                              :get-keyword-data='getKeywordData'
+                              :pos='i'
+                              :key='i'
+                              :active="true"
+                              v-on:card-selected="cardSelected"
+                              v-on:toggle-attacking='toggleAttacking'
+                              v-on:set-overlay-text='setOverlayText'>
+                        </card>
+                        <img v-if="shouldDisplayOverlay('attackOverlay', true, i)"
+                             :style='{position:"absolute",left:calcBoardX(i),top:"200px"}'
+                             class="boardOverlay"
+                             src="images/AttackOverlay.png" />
+                        <img v-if="shouldDisplayOverlay('defendOverlay', true, i)"
+                             :style='{position:"absolute",left:calcBoardX(i),top:"200px"}'
+                             class="boardOverlay"
+                             src="images/DefendOverlay.png" />
+                    </td>
+                </tr>
+            </table>
+            <span class="allyStats">
+                <div class="allyName stat">
+                    {{allyData.name}}
+                </div>
+                <div class="allySoul stat">
+                    Soul: {{allyData.soul}}
+                </div>
+                <div class="allyHP stat">
+                    HP: {{allyData.HP}}
+                </div>
+                <div class="allyGeo stat">
+                    Geo: {{allyData.geo}}
+                </div>
+                <div class="allyHand stat">
+                    Cards in Hand: {{allyData.cardsInHand}}/10
+                </div>
+                <div class="allyPlayer">
+                    <img class="allyFrame" :src="getAvatarFrameSprite(allyAvatarFrameState)"
+                         :style="{'cursor':allyAvatarFrameState=='normal'?'default':'pointer'}" />
+                    <img class="allyAvatar" src="images/BaseAvatar.png"
+                         :style="{'cursor':allyAvatarFrameState=='normal'?'default':'pointer'}"
+                         v-on:click="playerSelected(ID)" />
+                </div>
+                <img draggable="false" class="endTurnButton" src="images/EndTurn.png" v-on:click='sendThroughWebSocket(JSON.stringify({type:"endTurn"}))' />
+            </span>
+            <div class="allyHandArea">
+                <card v-for="(card,i) in hand"
+                      :style='calcStyle(i)'
+                      :card='card'
+                      :opacity='calcHandOpacity(i)'
+                      :get-card-data='getCardData'
+                      :get-keyword-data='getKeywordData'
+                      :pos='i'
+                      :key='i'
+                      :zone='"hand"'
+                      :active="true"
+                      v-on:set-held-card='setHeldCard'
+                      v-on:set-overlay-text='setOverlayText'></card>
+            </div>
+            <div v-if="temporaryDisplayingCard!=null">
+                <card 
+                      :style='{position:"absolute",left:"648px",top:"150px"}'
+                      :card='temporaryDisplayingCard'
+                      :opacity='1'
+                      :get-card-data='getCardData'
+                      :get-keyword-data='getKeywordData'
+                      :zone='selectingTarget?"beingPlayed":"stack"'
+                      :active="selectingTarget?true:false"
+                      v-on:set-held-card='setHeldCard'
+                      v-on:cancel-card-played='cancelCardPlayed'
+                      v-on:set-overlay-text='setOverlayText'></card>
+            </div>
+        </div>
+        <div id="gameover" class="gameover">
+        </div>
+        <div id="overlay" v-if="overlayText!=''">
+            <div class="overlayTextBox">{{overlayText}}<br><button v-on:click='overlayText=""'>Close box</button></div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,299 +1,321 @@
 const cardList = require('../data/cards.js').cardList
 const util = require('../../util.js')
+const ListenerReceiver = require('./ListenerReceiver.js').ListenerReceiver
+const ListenerEmitter = require('./ListenerEmitter.js').ListenerEmitter
 class Card {
-  constructor(name,team,game){
-    this.name = name
-    this.team = team
-    this.slot = null
-    this.statsSwapped = false
-    this.outgoingAuras = []
-    this.game = game
-    this.ingoingAuras = []
-    this.enter = []
-    this.fail = []
-    this.turnStartEffects = []
-    this.damage = 0
-    this.turnEndEffects = []
-    for(const [key,value] of Object.entries(cardList[name])){
-      this[key]=value
-    }
-    //HP after damage
-    this.realHP = this.baseHP
-    //base means the base stats of the card. Outgoing means after all auras
-    this.outgoingAttack = this.baseAttack
-    this.outgoingBaseHP = this.realHP
-    this.outgoingHP = this.realHP
-    this.attacking = false
-    this.canAttack = false
-    this.outgoingKeywords = this.baseKeywords
-    this.ableToAttack = {}
-    this.outgoingText = this.baseText
-    this.outgoingStatsSwapped = this.statsSwapped
-  }
-  getNonCircularCopy(){
-    let game = this.game
-    this.game = undefined
-    let toReturn = JSON.parse(JSON.stringify(this))
-    this.game = game
-    return toReturn
-  }
-  updateAttackable(){
-    let tauntCharacters = []
-    let allEnemyCharacters = []
-    let attackable = {}
-    for(let i=0;i<this.game.players[+!this.team].slots.length;i++){
-      let character = this.game.players[+!this.team].slots[i]
-      if(character!=this && character!=null){
-        if(character.outgoingKeywords.includes("Taunt")){
-          tauntCharacters.push(character)
+    constructor(name, team, game, zone) {
+        this.name = name
+        this.listenerEmitter = new ListenerEmitter(game)
+        this.listenerReceiver = new ListenerReceiver()
+        this.team = team
+        this.constructorObject = Card
+        this.slot = null
+        this.statsSwapped = false
+        this.game = game
+        this.damage = 0
+        this.loadData(cardList[name])
+        //HP after damage
+        //orig means the base stats of the card, cur means current stats before aurs, outgoing means after all auras, public means what the client sees.
+        if (this.type == "character") {
+            this.curBaseHP = this.origHP
+            this.curAttack = this.origAttack
+            this.realHP = this.origHP
+            this.attacking = false
+            this.prevAttack = 0
+            this.prevHP = 0
+            this.prevKeywords = []
+            this.summoningSick = true
+            //canAttack: Can we attack?
+            this.canAttack = true
+            this.hasAttacked = false
+            this.ableToAttack = {}
+            this.outgoingStatsSwapped = this.statsSwapped
         }
-        allEnemyCharacters.push(character)
-      }
+        this._zone = "void"
+        this.outgoingText = this.baseText
+        //For spells/cards with effects that trigger before being in play. Keep in mind that listeners assigned here are active everywhere until removed: 
+        //Dustpile, library, hand. Make sure you remove them when the card dies and check which zone it is in.
+
+        if (this.type == "spell" && !this.triggerEffect) {
+            this.triggerEffect = (() => { })
+        }
+        this.zone = zone
+        if (this.onCardCreation) {
+            this.game.addToStack(() => { this.onCardCreation() })
+        }
     }
-    let enemySlots = []
-    if(tauntCharacters.length===0){
-      for(let i=0;i<allEnemyCharacters.length;i++){
-        enemySlots.push(allEnemyCharacters[i].slot)
-      }
-      attackable.enemySlots = enemySlots
-      attackable.allySlots = []
-      attackable.allyPlayer = false
-      attackable.enemyPlayer = true
-    }else{
-      for(let i=0;i<tauntCharacters.length;i++){
-        attackable.push(tauntCharacters[i].slot)
-      }
-      attackable.enemySlots = enemySlots
-      attackable.allySlots = []
-      attackable.allyPlayer = false
-      attackable.enemyPlayer = false
+    get zone() {
+        return this._zone
     }
-    this.ableToAttack = attackable
-  }
-  attackMonster(target,override){
-    if(!override && !this.canAttack){
-      return
+    set zone(value) {
+        let prevZone = this._zone
+        this._zone = value
+        this.listenerEmitter.emitPassiveEvent({ prevZone, newZone: this._zone }, "cardZoneChange");
     }
-    if(!(target.team == this.team && this.ableToAttack.allySlots.includes(target.slot))&&!(target.team !== this.team && this.ableToAttack.enemySlots.includes(target.slot))){
-      return
+    get player() {
+        return this.game.players[this.team]
     }
-    this.attacking = "monster"
-    this.game.applyAuraEffects()
-    target.takeDamage(this,this.outgoingAttack)
-    this.takeDamage(target,target.outgoingAttack)
-    this.attacking = false
-    this.canAttack = false
-    this.game.applyAuraEffects()
-  }
-  attackPlayer(target,override){
-    if(!override && !this.canAttack){
-      return
+    get enemyPlayer() {
+        return this.game.players[+!this.team]
     }
-    if(!(target.id == this.team && this.ableToAttack.allyPlayer)&&!(target.id !== this.team && this.ableToAttack.enemyPlayer)){
-      return
-    }
-    this.attacking = "player"
-    this.game.applyAuraEffects()
-    target.takeDamage(this,this.outgoingAttack)
-    this.attacking = false
-    this.canAttack = false
-    this.game.applyAuraEffects()
-  }
-  takeDamage(source,amount){
-    this.damage+=amount
-    console.log(this.damage)
-    this.game.applyAuraEffects()
-  }
-  checkDeath(){
-    if(this.outgoingHP<=0){
-      this.die()
-    }
-  }
-  die(){
-    this.game.players[this.team].slots[this.slot] = null
-    this.game.players[this.team].addAnimation("awaitDeath",{ally:true,slot:this.slot},300)
-    this.game.players[this.team].addAnimation("die",{ally:true,slot:this.slot},0)
-    this.game.players[+!this.team].addAnimation("awaitDeath",{ally:false,slot:this.slot},300)
-    this.game.players[+!this.team].addAnimation("die",{ally:false,slot:this.slot},0)
-    this.game.applyAuraEffects()
-    for(let i=0;i<this.fail.length;i++){
-      this.fail[i](this.game)
-      this.game.applyAuraEffects()
-    }
-  }
-  turnStart(){
-    if(this.frozen){
-      this.frozen = false
-      this.canAttack = false
-    }else{
-      this.canAttack = true
-    }
-    for(let i=0;i<this.turnStartEffects.length;i++){
-      this.turnStartEffects[i](this.game)
-      this.game.applyAuraEffects()
-    }
-  }
-  turnEnd(){
-    for(let i=0;i<this.turnEndEffects.length;i++){
-      this.turnEndEffects[i](this.game)
-      this.game.applyAuraEffects()
-    }
-  }
-  onSummon(played){
-    if(this.outgoingKeywords.includes('Charge')){
-      this.canAttack = true
-    }
-  }
-  setupSummon(slot){
-    this.slot = slot
-    this.canAttack = false
-    this.game.players[+!this.team].addAnimation("enemySummonCard",{card:this.getNonCircularCopy(),slotNum:slot},0)
-  }
-  applyAuraEffects(){
-    let prevATK = this.outgoingAttack
-    let prevHP = this.outgoingHP
-    this.outgoingBaseHP = this.baseHP
-    this.outgoingHP = this.baseHP - this.damage
-    this.outgoingKeywords = this.baseKeywords
-    this.outgoingAttack = this.baseAttack
-    this.outgoingStatsSwapped = this.statsSwapped
-    //set stats auras
-    for(let i=0;i<7;i++){
-      if(this.game.players[+!this.team].slots[i]!=null && this.game.players[+!this.team].slots[i]!=this){
-        for(let j=0;j<this.game.players[+!this.team].slots[i].outgoingAuras.length;j++){
-          let setStats = this.game.players[+!this.team].slots[i].outgoingAuras[j](this).setStats
-          if(setStats!=undefined){
-            if(setStats.attack != undefined){
-              this.outgoingAttack = setStats.attack
+    get isPlayable() {
+        let playable = true
+        if (this.player.geo < this.outgoingGeoCost || (this.player.soul < this.outgoingSoulCost && this.outgoingSoulCost != undefined)) {
+            playable = false
+        }
+        playable = this.listenerEmitter.emitModifiableEvent({ card: this }, "modifyCardPlayable", playable)
+        playable = this.game.listenerEmitter.emitModifiableEvent({ card: this }, "modifyCardPlayable", playable)
+        //note that to prevent softlocks making a card unplayable if no targets comes after all modifyCardPlayables
+        if (this.requiresTarget&&this.type=="spell") {
+            let targets = this.getValidTargets()
+            if (util.targetsEmpty(targets)) {
+                playable = false
             }
-            if(setStats.hp != undefined){
-              this.outgoingBaseHP = setStats.hp
-              this.outgoingHP = this.outgoingBaseHP - this.damage
+        }
+        return playable
+    }
+    get outgoingGeoCost() {
+        let cost = this.geoCost
+        cost = this.listenerEmitter.emitModifiableEvent({ card: this }, "modifyCardGeoCost", cost)
+        cost = this.game.listenerEmitter.emitModifiableEvent({ card: this }, "modifyCardGeoCost", cost)
+        return cost
+    }
+    get outgoingSoulCost() {
+        let cost = this.soulCost
+        cost = this.listenerEmitter.emitModifiableEvent({ card: this }, "modifyCardSoulCost", cost)
+        cost = this.game.listenerEmitter.emitModifiableEvent({ card: this }, "modifyCardSoulCost", cost)
+        return cost
+    }
+    get outgoingBaseHP() {
+        let hp = this.origHP
+        hp = this.listenerEmitter.emitModifiableEvent({ card: this }, "modifyCardHP", hp)
+        hp = this.game.listenerEmitter.emitModifiableEvent({ card: this }, "modifyCardHP", hp)
+        return hp
+    }
+    get outgoingHP() {
+        return this.outgoingBaseHP-this.damage
+    }
+    get outgoingAttack() {
+        let attack = this.origAttack
+        attack = this.listenerEmitter.emitModifiableEvent({ card: this }, "modifyCardAttack", attack)
+        attack = this.game.listenerEmitter.emitModifiableEvent({ card: this }, "modifyCardAttack", attack)
+        return attack
+    }
+    get outgoingKeywords() {
+        let keywords = this.baseKeywords
+        keywords = this.listenerEmitter.emitModifiableEvent({ card: this }, "modifyCardKeywords", keywords)
+        keywords = this.game.listenerEmitter.emitModifiableEvent({ card: this }, "modifyCardKeywords", keywords)
+        keywords = util.stripDuplicates(keywords)
+        return keywords
+    }
+    //DUMMY FUNCTION. REMOVE WHEN CARDS ARE FINISHED.
+    performSetup() {
+
+    }
+    //Character only
+    attackMonster(target, override) {
+        this.updateAttackable()
+        if (!override && !this.canAttack) {
+            return
+        }
+        if (!(target.team == this.team && this.ableToAttack.allySlots.includes(target.slot)) && !(target.team !== this.team && this.ableToAttack.enemySlots.includes(target.slot))) {
+            return
+        }
+        this.attacking = "monster"
+        this.player.listenerEmitter.emitPassiveEvent({ monster: this, targetType: "monster", target }, "allyToAttack")
+        this.player.addAnimation("displayAttackOverlay", { ally: true, slot: this.slot }, 0)
+        this.enemyPlayer.addAnimation("displayAttackOverlay", { ally: false, slot: this.slot }, 0)
+        this.game.players[target.team].addAnimation("displayDefendOverlay", { ally: true, slot: target.slot }, 0)
+        this.game.players[+!target.team].addAnimation("displayDefendOverlay", { ally: false, slot: target.slot }, 0)
+        //pause
+        this.player.addAnimation("wait", {}, 400)
+        this.enemyPlayer.addAnimation("wait", {}, 400)
+
+        this.player.addAnimation("hideAttackOverlay", {}, 0)
+        this.enemyPlayer.addAnimation("hideAttackOverlay", {}, 0)
+        this.player.addAnimation("hideDefendOverlay", {}, 0)
+        this.enemyPlayer.addAnimation("hideDefendOverlay", {}, 0)
+        let enemyDamage = target.outgoingAttack
+        target.takeDamage(this, this.outgoingAttack)
+        this.takeDamage(target, enemyDamage)
+        this.attacking = false
+        this.hasAttacked = true
+        if (this.afterAttack) {
+            this.afterAttack(target)
+        }
+        this.player.listenerEmitter.emitPassiveEvent({ monster: this, targetType: "monster", target }, "allyAttacked")
+    }
+    attackPlayer(target, override) {
+        this.updateAttackable()
+        if (!override && !this.canAttack) {
+            return
+        }
+        if (!(target.id == this.team && this.ableToAttack.allyPlayer) && !(target.id !== this.team && this.ableToAttack.enemyPlayer)) {
+            return
+        }
+        this.attacking = "player"
+        this.player.listenerEmitter.emitPassiveEvent({ monster: this, targetType: "monster", target }, "allyToAttack")
+        //display attack markers
+        this.player.addAnimation("displayAttackOverlay", { ally: true, slot: this.slot }, 0)
+        this.game.players[target.id].addAnimation("displayAvatarAttacked", { ally: true }, 0)
+        this.enemyPlayer.addAnimation("displayAttackOverlay", { ally: false, slot: this.slot }, 0)
+        this.game.players[+!target.id].addAnimation("displayAvatarAttacked", { ally: false }, 0)
+        //pause
+        this.player.addAnimation("wait", {}, 400)
+        this.enemyPlayer.addAnimation("wait", {}, 400)
+
+        this.player.addAnimation("hideAttackOverlay", {}, 0)
+        this.game.players[target.id].addAnimation("hideAvatarAttacked", { ally: true }, 0)
+        this.enemyPlayer.addAnimation("hideAttackOverlay", {}, 0)
+        this.game.players[+!target.id].addAnimation("hideAvatarAttacked", { ally: false }, 0)
+        target.takeDamage(this, this.outgoingAttack)
+        this.attacking = false
+        this.hasAttacked = true
+        if (this.afterAttack) {
+            this.afterAttack(target)
+        }
+        this.player.listenerEmitter.emitPassiveEvent({ monster: this, targetType: "player", target }, "allyAttacked")
+    }
+    modifyDamage(source, amount) {
+        return amount
+    }
+    takeDamage(source, amount) {
+        if (amount <= 0) {
+            return
+        }
+        if (this.outgoingKeywords.includes('Armor')) {
+            amount -= 1
+        }
+        amount = this.modifyDamage(source, amount)
+        if (amount < 0) {
+            amount = 0
+        }
+        this.damage += amount
+        this.checkUpdates()
+    }
+    checkDeath() {
+        if (this.outgoingHP <= 0) {
+            this.die()
+        }
+    }
+    checkUpdates() {
+        if (this.outgoingHP != this.prevHP || this.outgoingAttack != this.prevAttack||!util.arrsEqual(this.prevKeywords,this,this.outgoingKeywords)) {
+            this.player.addAnimation("updateBoardCardData", { ally: true, slot: this.slot, value: this.getSendableCopy() })
+            this.enemyPlayer.addAnimation("updateBoardCardData", { ally: false, slot: this.slot, value: this.getSendableCopy() })
+        }
+        if (this.outgoingHP <= 0) {
+            this.die()
+        }
+        this.prevHP = this.outgoingHP
+        this.prevAttack = this.outgoingAttack
+        this.prevKeywords = this.outgoingKeywords
+    }
+    die() {
+        this.player.slots[this.slot] = null
+        this.zone = "death"
+        this.player.addAnimation("awaitDeath", { ally: true, slot: this.slot }, 300)
+        this.enemyPlayer.addAnimation("awaitDeath", { ally: false, slot: this.slot }, 300)
+        this.listenerEmitter.emitPassiveEvent({ monster: this }, "triggerDieEvents")
+        this.player.listenerEmitter.emitPassiveEvent({ monster: this }, "allyDied")
+    }
+    turnStart() {
+        this.summoningSick = false
+        this.hasAttacked = false;
+        if (this.turnStartEffect) {
+            this.turnStartEffect(this.game)
+        }
+    }
+    turnEnd() {
+        if (this.frozen) {
+            this.frozen = false
+        }
+        if (this.turnEndEffect) {
+            this.turnEndEffect(this.game)
+        }
+    }
+    updateAttackable() {
+        if (!this.frozen && !this.hasAttacked && !(this.summoningSick && !this.outgoingKeywords.includes("Charge"))) {
+            this.canAttack = true
+        } else {
+            this.canAttack = false
+        }
+        let tauntCharacters = []
+        let allEnemyCharacters = []
+        let attackable = {}
+        for (let i = 0; i < this.enemyPlayer.slots.length; i++) {
+            let character = this.enemyPlayer.slots[i]
+            if (character != this && character != null) {
+                if (character.outgoingKeywords.includes("Taunt")) {
+                    tauntCharacters.push(character)
+                }
+                allEnemyCharacters.push(character)
             }
-          }
         }
-      }
-    }
-    for(let i=0;i<7;i++){
-      if(this.game.players[this.team].slots[i]!=null && this.game.players[this.team].slots[i]!=this){
-        for(let j=0;j<this.game.players[this.team].slots[i].outgoingAuras.length;j++){
-          let setStats = this.game.players[this.team].slots[i].outgoingAuras[j](this).setStats
-          if(setStats!=undefined){
-            if(setStats.attack != undefined){
-              this.outgoingAttack = setStats.attack
+        let enemySlots = []
+        if (tauntCharacters.length === 0) {
+            for (let i = 0; i < allEnemyCharacters.length; i++) {
+                enemySlots.push(allEnemyCharacters[i].slot)
             }
-            if(setStats.hp != undefined){
-              this.outgoingBaseHP = setStats.hp
-              this.outgoingHP = this.outgoingBaseHP - this.damage
+            attackable.enemySlots = enemySlots
+            attackable.allySlots = []
+            attackable.allyPlayer = false
+            attackable.enemyPlayer = true
+        } else {
+            for (let i = 0; i < tauntCharacters.length; i++) {
+                enemySlots.push(tauntCharacters[i].slot)
             }
-          }
+            attackable.enemySlots = enemySlots
+            attackable.allySlots = []
+            attackable.allyPlayer = false
+            attackable.enemyPlayer = false
         }
-      }
+        this.ableToAttack = attackable
     }
-    for(let i=0;i<this.ingoingAuras.length;i++){
-      let setStats = this.ingoingAuras[i]().setStats
-      if(setStats!=undefined){
-        if(setStats.attack != undefined){
-          this.outgoingAttack = setStats.attack
+    onSummon(played, target) {
+        if (played) {
+            this.listenerEmitter.emitPassiveEvent({ target }, "triggerPlayEvents");
         }
-        if(setStats.hp != undefined){
-          this.outgoingBaseHP = setStats.hp
-          this.outgoingHP = this.outgoingBaseHP - this.damage
+    }
+    setupSummon(slot) {
+        this.slot = slot
+        this.zone = "board"
+        this.enemyPlayer.addAnimation("enemySummonCharacter", { card: this.getSendableCopy(), slot }, 0)
+        this.player.addAnimation("summonCharacter", { card: this.getSendableCopy(), slot }, 0)
+        this.performSetup()
+    }
+    //Spell only
+    // both
+    getSendableCopy() {
+        this.updateAttackable()
+        let game = this.game
+        this.publicGeoCost = this.outgoingGeoCost
+        this.publicSoulCost = this.outgoingSoulCost
+        if (this.type == "character") {
+            this.publicAttack = this.outgoingAttack
+            this.publicHP = this.outgoingHP
+            this.publicKeywords = this.outgoingKeywords
         }
-      }
-    }
-    // modify stats auras and keyword auras
-    for(let i=0;i<7;i++){
-      if(this.game.players[+!this.team].slots[i]!=null && this.game.players[+!this.team].slots[i]!=this){
-        for(let j=0;j<this.game.players[+!this.team].slots[i].outgoingAuras.length;j++){
-          let aura = this.game.players[+!this.team].slots[i].outgoingAuras[j](this)
-          if(aura.stats!=undefined){
-            if(aura.stats.attack != undefined){
-              this.outgoingAttack += aura.stats.attack
-            }
-            if(aura.stats.hp != undefined){
-              this.outgoingBaseHP += aura.stats.hp
-              this.outgoingHP = this.outgoingBaseHP - this.damage
-            }
-          }
-          if(aura.keywords!=undefined){
-            this.outgoingKeywords = util.stripDuplicates(this.outgoingKeywords.concat(aura.keywords))
-          }
+        let emitter = this.listenerEmitter
+        this.isCardPlayable = this.isPlayable
+        this.game = undefined
+        this.listenerEmitter = undefined
+        let toReturn = JSON.parse(JSON.stringify(this))
+        this.game = game
+        this.listenerEmitter = emitter
+        this.isCardPlayable = null
+        this.publicGeoCost = null
+        this.publicSoulCost = null
+        if (this.type == "character") {
+            this.publicHP = null
+            this.publicAttack = null
+            this.publicKeywords = null
         }
-      }
+        return toReturn
     }
-    for(let i=0;i<7;i++){
-      if(this.game.players[this.team].slots[i]!=null && this.game.players[this.team].slots[i]!=this){
-        for(let j=0;j<this.game.players[this.team].slots[i].outgoingAuras.length;j++){
-          let aura = this.game.players[this.team].slots[i].outgoingAuras[j](this)
-          if(aura.stats!=undefined){
-            if(aura.stats.attack != undefined){
-              this.outgoingAttack += aura.stats.attack
-            }
-            if(aura.stats.hp != undefined){
-              this.outgoingBaseHP += aura.stats.hp
-              this.outgoingHP = this.outgoingBaseHP - this.damage
-            }
-          }
-          if(aura.keywords!=undefined){
-            this.outgoingKeywords = util.stripDuplicates(this.outgoingKeywords.concat(aura.keywords))
-          }
+    loadData(dataToLoad) {
+        for (const [key, value] of Object.entries(dataToLoad)) {
+            this[key] = value
         }
-      }
     }
-    for(let i=0;i<this.ingoingAuras.length;i++){
-      let aura = this.ingoingAuras[i]()
-      if(aura.stats!=undefined){
-        if(aura.stats.attack != undefined){
-          this.outgoingAttack = aura.stats.attack
-        }
-        if(aura.stats.hp != undefined){
-          this.outgoingBaseHP += aura.stats.hp
-          this.outgoingHP = this.outgoingBaseHP - this.damage
-        }
-      }
-      if(aura.keywords != undefined){
-        this.outgoingKeywords = util.stripDuplicates(this.outgoingKeywords.concat(aura.keywords))
-      }
-    }
-    //swap stats auras
-    for(let i=0;i<7;i++){
-      if(this.game.players[+!this.team].slots[i]!=null && this.game.players[+!this.team].slots[i]!=this){
-        for(let j=0;j<this.game.players[+!this.team].slots[i].outgoingAuras.length;j++){
-          let aura = this.game.players[+!this.team].slots[i].outgoingAuras[j](this)
-          if(aura.swapStats!=undefined){
-            this.outgoingStatsSwapped = this.outgoingStatsSwapped==!aura.swapStats
-          }
-        }
-      }
-    }
-    for(let i=0;i<7;i++){
-      if(this.game.players[this.team].slots[i]!=null && this.game.players[this.team].slots[i]!=this){
-        for(let j=0;j<this.game.players[this.team].slots[i].outgoingAuras.length;j++){
-          let aura = this.game.players[this.team].slots[i].outgoingAuras[j](this)
-          if(aura.swapStats!=undefined){
-            this.outgoingStatsSwapped = this.outgoingStatsSwapped==!aura.swapStats
-          }
-        }
-      }
-    }
-    for(let i=0;i<this.ingoingAuras.length;i++){
-      let aura = this.ingoingAuras[i](this)
-      if(aura.swapStats!=undefined){
-        this.outgoingStatsSwapped = this.outgoingStatsSwapped==!aura.swapStats
-      }
-    }
-    if(this.outgoingStatsSwapped){
-      this.outgoingHP = this.outgoingAttack - this.damage
-      this.outgoingAttack = this.outgoingBaseHP
-    }
-    if(this.outgoingHP!=prevHP||prevATK!=this.outgoingAttack){
-      this.game.players[this.team].addAnimation("cardStatChange",{ally:true,pos:this.slot,hp:this.outgoingHP,attack:this.outgoingAttack},0)
-      this.game.players[+!this.team].addAnimation("cardStatChange",{ally:false,pos:this.slot,hp:this.outgoingHP,attack:this.outgoingAttack},0)
-    }
-    //alter card text to match keywords
-    this.updateAttackable()
-    this.checkDeath(this.game)
-  }
 }
-module.exports = {Card}
+module.exports = { Card }

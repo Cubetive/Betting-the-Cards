@@ -8,6 +8,15 @@ const stripDuplicates = function(array){
   }
   return newArray
 }
+const convertToDeck = function(cards){
+  let deck = []
+  for(const [name,value] of Object.entries(cards)){
+    for(let i=0;i<value.amount;i++){
+      deck.push(name)
+    }
+  }
+  return deck
+}
 function shuffle(array) {
   var currentIndex = array.length, temporaryValue, randomIndex;
 
@@ -50,6 +59,19 @@ const getRandomCards = (amount,requirements)=>{
     }
   }
   shuffle(possibilities)
-  return possibilities.splice(0,amount)
+  return possibilities.slice(0,amount)
 }
-module.exports = {stripDuplicates,shuffle,weightedRandomChance,getRandomCards}
+const targetsEmpty = (targets) => {
+    return !targets.allyPlayer && !targets.enemyPlayer && targets.allySlots.length == 0 && targets.enemySlots.length == 0
+}
+const arrsEqual = function(arr1, arr2){
+    if (arr1.length != arr2.length) {
+        return false
+    }
+    for (let i = 0; i < arr1.length; i++) {
+        if (arr1[i] != arr2[i]) {
+            return false
+        }
+    }
+}
+module.exports = {stripDuplicates,shuffle,weightedRandomChance,getRandomCards,convertToDeck,targetsEmpty,arrsEqual}

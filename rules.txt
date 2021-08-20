@@ -1,0 +1,64 @@
+geo stacking
+
+Card designs:
+10 neutral
+false knight
+  failed champion
+dream nail
+soul master
+  soul tyrant
+grubfather
+  grub
+stalking devout
+salubra
+flukemarm
+focus
+slash
+vengeful spirit
+
+5 infection
+furious vengefly
+hollow knight
+  radiance
+broken vessel
+  lost kin
+infected fly
+cowardly husk
+
+5 bugs
+dung defender
+  white defender
+elderbug
+hornet
+zote
+  grey prince zote
+trial of the fool
+
+5 mantis
+mantis lords
+mantis child
+mantis claw
+traitor lord - infection mantis hybrid
+mantis thingy
+
+5 godhome
+godseeker
+  godhome
+Audience member
+hall of gods
+scorn
+sisters of battle
+
+8 charms
+lifeblood heart
+grubsong
+hiveblood
+thorns of agony
+kingsoul
+soul twister
+fury of the fallen
+deep focus
+
+masks. Each player has 5hp and only takes one dmg from attacks except special ones.
+
+Soul. Spells cost soul as well as geo or only soul. When a monster attacks you gain one soul.

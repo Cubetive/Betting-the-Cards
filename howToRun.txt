@@ -5,3 +5,22 @@
 5) type node server.js
 5) Open the website 127.0.0.1:8081 twice.
 6) Enjoy
+
+The index.html is mostly empty, since I'm unsure what to put there. The save server button saves the accounts of everyone, so that restarting the server doesn't mean you have to rebuild your decs.
+The game consists of many cards, however only a few have actually been implemented yet. These are:
+Seer
+Grubfather
+BOOM BOOM
+trolling...
+Focus
+Slash
+Loan Shark
+Nop dyne
+False knight
+Dream Nail
+All other cards have no effect currently and are just stats + cost.
+The game runs off of a stack system - try playing BOOM BOOM with only dream nails out - you don't draw any cards.
+Two pre existing accounts exist - John and Steve. Both have the password "password".
+I reccommend pulling up one of them in an incognito window and the other up in a normal, to avoid them logging each other out.
+Currently there are no deck size requirements for testing purposes.
+Look at the comments in server/play/classes/ListenerEmitter.js

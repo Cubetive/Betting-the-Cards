@@ -1,0 +1,11 @@
+
+
+
+Special The White Palace Wording
+
+
+
+Look into how to detect when a websocket closes.
+
+TODO immediate:
+Create a look at menu

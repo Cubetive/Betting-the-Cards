@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Hollow Cards - Queue</title>
+  <script defer src="game/game.js"></script>
+  <script defer src="game/animations.js"></script>
+  <script src="game/pixi.min.js"></script>
+  <script defer src="game/gameWebsocket.js"></script>
+  <link rel="stylesheet" href="css/game.css"></link>
+  <link rel="stylesheet" href="css/global.css"></link>
+</head>
+<body>
+  <script defer type="text/javascript">
+    let type = "WebGL"
+    if(!PIXI.utils.isWebGLSupported()){
+      type = "canvas"
+    }
+    PIXI.utils.sayHello(type)
+  </script>
+  <header id="logo">
+    <h1 id="title">Hollow Cards</h1>
+  </header>
+  <div id="gamearea" class="gamearea">
+    <!-- Outline -->
+  </div>
+  <div id="gameover" class="gameover">
+  </div>
+</body>
+</html>

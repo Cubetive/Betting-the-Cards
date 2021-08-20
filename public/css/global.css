@@ -19,9 +19,9 @@ a {
   padding-right: 20px;
 }
 
-#menu {
+#navBar {
   margin: auto;
-  width: 50%;
+  width: 98%;
   border: 3px solid white;
   padding: 10px;
 }

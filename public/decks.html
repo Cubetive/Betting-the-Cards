@@ -1,0 +1,128 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <title>Hollow Card Decks</title>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" type="text/css" href="css/decks.css"></link>
+  <link rel="stylesheet" type="text/css" href="css/global.css"></link>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script defer src="navBar.js"></script>
+</head>
+<body>
+  <header>
+    <h1 id="title">Hollow Cards</h1>
+  </header>
+  <div id="navBar">
+  </div>
+  <div id = "app">
+    <div :class = "getSelectable(card)" v-on:click = "addToDeck(card)" v-for="(card,i) in relevantCollection.slice(collectionPage*8,collectionPage*8+8)">
+      <div class = "card" v-if="allCardList[card[0]].type=='character'" :style="{'top':calcY(i),'left':calcX(i)}">
+        <img src = "images/cardFrameCollection.png"/>
+        <div class = "cardName">{{card[0]}}</div>
+        <div class = "cardCost">{{allCardList[card[0]].cost}}</div>
+        <div class = "cardHP" style = "color:green">{{allCardList[card[0]].origHP}}</div>
+        <div class = "cardAttack" style="color:red">{{allCardList[card[0]].origAttack}}</div>
+        <div class = "cardAbility">
+          <span v-for="part in allCardList[card[0]].baseText">
+            <span v-if="part.type=='plainText'">{{part.value}}</span>
+            <span v-if="part.type=='cardName'" style="color:blue" v-on:mouseover="onMouseOverCollection(part.name,i)" v-on:mouseleave="tempDisplayCard=null">{{part.value}}</span>
+          </span>
+        </div>
+        <div v-if="allCardList[card[0]].dreamVariant" class = "cardDreamVariant">
+          <img style="height: 16px; width: 16px" v-on:contextmenu.prevent="overlayText='Dream Variants: '+keywordData['Dream Variant'].description" v-on:mouseover = "onMouseOverCollection(allCardList[card[0]].dreamVariant,i)" v-on:mouseleave="tempDisplayCard=null" src = "images/Faction0.png"/>
+        </div>
+        <div v-if="allCardList[card[0]].awakenedDreamVariant" class = "cardDreamVariant">
+          <img style="height: 16px; width: 16px" v-on:contextmenu.prevent="overlayText='Awakened Dream Variants: '+keywordData['Awakened Dream Variant'].description" v-on:mouseover = "onMouseOverCollection(allCardList[card[0]].awakenedDreamVariant,i)" v-on:mouseleave="tempDisplayCard=null" src = "images/Faction0.png"/>
+        </div>
+        <div v-if="allCardList[card[0]].baseKeywords.length>0">
+          <div v-for="(keyword,i) in allCardList[card[0]].baseKeywords" v-on:contextmenu.prevent="overlayText=keyword+': '+keywordData[keyword].description" class = "cardKeyword" :style = "{left:calcKeywordX(allCardList[card[0]],i)}">
+            <img style="height: 16px; width: 16px" src = "images/Faction0.png"/>
+          </div>
+        </div>
+        <div class = "cardAmount">x{{getAmountRemaining(card[0],card[1].amount)}}</div>
+      </div>
+      <div class = "card" v-if="allCardList[card[0]].type=='spell'" :style="{'top':calcY(i),'left':calcX(i)}">
+        <img src = "images/spellCardFrameCollection.png"/>
+        <div class = "cardName">{{card[0]}}</div>
+        <div class = "cardCost">{{allCardList[card[0]].cost}}</div>
+        <div class = "cardAbility">
+          <span v-for="part in allCardList[card[0]].baseText">
+            <span v-if="part.type=='plainText'">{{part.value}}</span>
+            <span v-if="part.type=='cardName'" style="color:blue" v-on:mouseover="onMouseOverCollection(part.name,i)" v-on:mouseleave="tempDisplayCard=null">{{part.value}}</span>
+          </span>
+        </div>
+        <div class = "cardAmount">x{{getAmountRemaining(card[0],card[1].amount)}}</div>
+        <div class = "cardSoulCost">{{allCardList[card[0]].soulCost}}</div>
+      </div>
+    </div>
+    <button class="fac0IMG" v-on:click = "changeFaction(0,0)" :class = "decks[curDeckID]?(decks[curDeckID].factions[0]==0?'selected':''):''">
+      <img src="images/Faction0.png"></img>
+    </button>
+    <button class="fac1IMG" v-on:click = "changeFaction(0,1)" :class = "decks[curDeckID]?(decks[curDeckID].factions[0]==1?'selected':''):''">
+      <img src="images/Faction0.png"></img>
+    </button>
+    <button class="fac2IMG" v-on:click = "changeFaction(1,0)" :class = "decks[curDeckID]?(decks[curDeckID].factions[1]==0?'selected':''):''">
+      <img src="images/Faction0.png"></img>
+    </button>
+    <button class="fac3IMG" v-on:click = "changeFaction(1,1)" :class = "decks[curDeckID]?(decks[curDeckID].factions[1]==1?'selected':''):''">
+      <img src="images/Faction0.png"></img>
+    </button>
+    <select id="deckChooser" v-model="curDeckID" class = "deckChooser">
+      <option v-for="(deck,i) in decks"
+      :value="i">{{deck.name}}</option>
+    </select>
+    <button v-on:click="decColPage()">(--</button>
+    <button v-on:click="incColPage()">--)</button>
+    <span>{{collectionPage+1}}/{{Math.ceil(relevantCollection.length/8)}}</span>
+    <div class = "cardDeck selectable"
+    v-on:click="removeFromDeck(cardName)"
+    v-for="(card,cardName,i) in decks[curDeckID]?decks[curDeckID].cards:[]"
+    :style='{"top":(278.8+20.4*i)+"px"}'
+    v-on:mouseover = "onMouseOverDeck(cardName,i)"
+    v-on:mouseleave="tempDisplayCard=null">{{cardName}}<span class='cardNumber'>{{card.amount}}</span></div>
+    <div v-if="tempDisplayCard!=null">
+      <div class = "temporaryCard" v-if="tempDisplayCard.card.type=='character'" :style="{'top':tempDisplayCard.y,'left':tempDisplayCard.x}">
+        <img src = "images/cardFrame.png"/>
+        <div class = "cardName">{{tempDisplayCard.name}}</div>
+        <div class = "cardCost">{{tempDisplayCard.card.cost}}</div>
+        <div class = "cardHP" style = "color:green">{{tempDisplayCard.card.origHP}}</div>
+        <div class = "cardAttack" style="color:red">{{tempDisplayCard.card.origAttack}}</div>
+        <div class = "cardAbility">
+          <span v-for="part in tempDisplayCard.card.baseText">
+            <span v-if="part.type=='plainText'">{{part.value}}</span>
+            <span v-if="part.type=='cardName'" style="color:blue" v-on:mouseover="onMouseOverCollection(part.name,i)">{{part.value}}</span>
+          </span>
+        </div>
+        <div v-if="tempDisplayCard.card.dreamVariant" class = "cardDreamVariant">
+          <img style="height: 16px; width: 16px" v-on:mouseover = "onMouseOverCollection(tempDisplayCard.card.dreamVariant,i)" v-on:mouseleave="tempDisplayCard=null" src = "images/Faction0.png"/>
+        </div>
+        <div v-if="tempDisplayCard.card.awakenedDreamVariant" class = "cardDreamVariant">
+          <img style="height: 16px; width: 16px" v-on:mouseover = "onMouseOverCollection(tempDisplayCard.card.awakenedDreamVariant,i)" v-on:mouseleave="tempDisplayCard=null" src = "images/Faction0.png"/>
+        </div>
+        <div v-if="tempDisplayCard.card.baseKeywords.length>0">
+          <div v-for="(keyword,i) in tempDisplayCard.card.baseKeywords" class = "cardKeyword" :style = "{left:calcKeywordX(allCardList[tempDisplayCard.name],i)}">
+            <img style="height: 16px; width: 16px" src = "images/Faction0.png"/>
+          </div>
+        </div>
+      </div>
+      <div class = "temporaryCard" v-if="tempDisplayCard.card.type=='spell'" :style="{'top':tempDisplayCard.y,'left':tempDisplayCard.x}">
+        <img src = "images/spellCardFrame.png"/>
+        <div class = "cardName">{{tempDisplayCard.name}}</div>
+        <div class = "cardCost">{{tempDisplayCard.card.cost}}</div>
+        <div class = "cardAbility">
+          <span v-for="part in tempDisplayCard.card.baseText">
+            <span v-if="part.type=='plainText'">{{part.value}}</span>
+            <span v-if="part.type=='cardName'" style="color:darkblue" v-on:mouseover="onMouseOverCollection(part.name,i)">{{part.value}}</span>
+          </span>
+        </div>
+        <div class = "cardSoulCost">{{tempDisplayCard.card.soulCost}}</div>
+      </div>
+    </div>
+    <div id="overlay" v-if="overlayText!=''">
+      <div class="overlayTextBox">{{overlayText}}<br><button v-on:click='overlayText=""'>Close box</button></div>
+    </div>
+  </div>
+  <script src="decks/websocketDeck.js"></script>
+  <script src="decks/decks.js"></script>
+</body>
+</html>

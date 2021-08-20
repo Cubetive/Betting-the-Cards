@@ -1,25 +1,21 @@
 const util = require('./util.js')
 const runDBTests = (db)=>{
   db.newPlayer("Steve","password")
+  db.newPlayer("John","password")
   db.incXP("Steve",1500)
   db.incXP("Steve",7000)
-  db.setDust("Steve",700)
-  db.craftCard("Steve","Stickman BOi")
-  console.log(JSON.stringify(db))
-  db.dustCard("Steve","Stickman BOi")
-  console.log(JSON.stringify(db))
+  db.setDust("Steve",7000000)
+  db.craftAllCards("Steve")
+  db.craftAllCards("John")
   db.setMoney("Steve",700)
   db.buyPack("Steve")
-  console.log(JSON.stringify(db))
   db.openPack("Steve")
-  console.log(JSON.stringify(db))
   for(let i=0;i<2500;i++){
     db.setMoney("Steve",100)
     db.buyPack("Steve")
     db.openPack("Steve")
   }
-  console.log(JSON.stringify(db))
-  db.autoDisenchant("Steve")
+//  db.autoDisenchant("Steve")
   console.log(JSON.stringify(db))
 }
 module.exports = {runDBTests}
