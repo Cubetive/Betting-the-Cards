@@ -92,7 +92,7 @@ const playerInGame = function (playerName) {
     return false
 }
 //handle requests
-app.listen(8081)
+app.listen(process.env.PORT || 8081)
 const Database = new db.Database(beginGame, playerInGame)
 tests.runDBTests(Database)
 //gameplay - 3000
