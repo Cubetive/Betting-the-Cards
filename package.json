@@ -12,5 +12,8 @@
   },
   "engines": {
     "node": "12.18.4"
+  },
+  "scripts": {
+    "start": "node index.js"
   }
 }
