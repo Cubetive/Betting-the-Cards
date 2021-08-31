@@ -8,8 +8,10 @@ const cardList = require('./server/play/data/cards.js').cardList
 const rarityList = require('./server/play/data/rarity.js').rarityList
 const keywords = require('./server/play/data/keywords.js').keywords
 const bodyParser = require("body-parser");
+var helmet = require('helmet');
 const ws = require('ws');
 var app = express();
+app.use(helmet());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(express.static(__dirname + "/public"))

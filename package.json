@@ -5,8 +5,9 @@
   "main": "index.js",
   "dependencies": {
     "express": "^4.17.1",
-    "hbs": "^4.1.1",
+    "hbs": "^4.1.2",
+    "helmet": "^4.6.0",
     "node.js": "0.0.1-security",
-    "ws": "^7.3.1"
+    "ws": "^7.5.4"
   }
 }

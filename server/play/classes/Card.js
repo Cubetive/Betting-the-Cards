@@ -212,10 +212,6 @@ class Card {
                 !util.arrsEqual(this.prevKeywords, this.outgoingKeywords) ||
                 this.prevGeoCost != this.outgoingGeoCost
             ) {
-                console.log(this.outgoingHP, this.prevHP)
-                console.log(this.outgoingAttack, this.prevAttack)
-                console.log(this.prevKeywords, this.outgoingKeywords, util.arrsEqual(this.prevKeywords, this.outgoingKeywords))
-                console.log(this.prevGeoCost,this.outgoingGeoCost)
                 if (this.zone == "board") {
                     this.player.addAnimation("updateBoardCardData", { ally: true, slot: this.slot, value: this.getSendableCopy() })
                     this.enemyPlayer.addAnimation("updateBoardCardData", { ally: false, slot: this.slot, value: this.getSendableCopy() })
