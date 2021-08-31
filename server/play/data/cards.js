@@ -204,7 +204,6 @@ const cardList = {
             this.playFromDeckListener = this.listenerReceiver.addEventHandler(
                 "NopDynePlayFromDeck",
                 () => {
-                    console.log("considering beineg played")
                     if (this.zone != "deck") {
                         return
                     }
@@ -396,22 +395,20 @@ const cardList = {
             this.removeAuraListener = this.listenerReceiver.addEventHandler(
                 "GrubFatherRemoveAuras",
                 () => {
-                    this.game.listenerEmitter.removeListener(this.removeAuraListener)
-                    this.game.listenerEmitter.removeListener(this.modifyCardAttackListener)
-                    this.game.listenerEmitter.removeListener(this.modifyCardHPListener)
-                    this.game.listenerEmitter.removeListener(this.modifyCardKeywordListener)
-                    this.modifyCardKeywordListener = null
-                    this.modifyCardHPListener = null
-                    this.modifyCardAttackListener = null
-                    this.removeAuraListener = null
-                    for (let i = 0; i < this.player.slots.length; i++) {
-                        if (this.player.slots[i] != null) {
-                            this.player.slots[i].checkUpdates()
-                        }
+                    if (data.newZone != "board") {
+                        this.game.listenerEmitter.removeListener(this.removeAuraListener)
+                        this.game.listenerEmitter.removeListener(this.modifyCardAttackListener)
+                        this.game.listenerEmitter.removeListener(this.modifyCardHPListener)
+                        this.game.listenerEmitter.removeListener(this.modifyCardKeywordListener)
+                        this.modifyCardKeywordListener = null
+                        this.modifyCardHPListener = null
+                        this.modifyCardAttackListener = null
+                        this.removeAuraListener = null
                     }
                 },
                 ListenerReceiver.genEventFunction("cardZoneChange"),
-                this.listenerEmitter
+                this.listenerEmitter,
+                true
             )
         },
     },
@@ -497,7 +494,7 @@ const cardList = {
                     this.modifyCardPlayableListener = null
                     this.cardPlayedListener = null
                 },
-                ListenerReceiver.genEventFunction("cardPlayed"),
+                ListenerReceiver.genEventFunction("allyCardPlayed"),
                 this.player.listenerEmitter
             )
         },

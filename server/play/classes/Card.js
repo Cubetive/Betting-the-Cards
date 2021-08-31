@@ -32,6 +32,8 @@ class Card {
             this.outgoingStatsSwapped = this.statsSwapped
         }
         this._zone = "void"
+        this.prevSoulCost = null
+        this.prevGeoCost = null
         this.outgoingText = this.baseText
         //For spells/cards with effects that trigger before being in play. Keep in mind that listeners assigned here are active everywhere until removed: 
         //Dustpile, library, hand. Make sure you remove them when the card dies and check which zone it is in.
@@ -66,7 +68,7 @@ class Card {
         playable = this.listenerEmitter.emitModifiableEvent({ card: this }, "modifyCardPlayable", playable)
         playable = this.game.listenerEmitter.emitModifiableEvent({ card: this }, "modifyCardPlayable", playable)
         //note that to prevent softlocks making a card unplayable if no targets comes after all modifyCardPlayables
-        if (this.requiresTarget&&this.type=="spell") {
+        if (this.requiresTarget && this.type == "spell") {
             let targets = this.getValidTargets()
             if (util.targetsEmpty(targets)) {
                 playable = false
@@ -93,7 +95,7 @@ class Card {
         return hp
     }
     get outgoingHP() {
-        return this.outgoingBaseHP-this.damage
+        return this.outgoingBaseHP - this.damage
     }
     get outgoingAttack() {
         let attack = this.origAttack
@@ -156,18 +158,13 @@ class Card {
         this.attacking = "player"
         this.player.listenerEmitter.emitPassiveEvent({ monster: this, targetType: "monster", target }, "allyToAttack")
         //display attack markers
-        this.player.addAnimation("displayAttackOverlay", { ally: true, slot: this.slot }, 0)
-        this.game.players[target.id].addAnimation("displayAvatarAttacked", { ally: true }, 0)
-        this.enemyPlayer.addAnimation("displayAttackOverlay", { ally: false, slot: this.slot }, 0)
-        this.game.players[+!target.id].addAnimation("displayAvatarAttacked", { ally: false }, 0)
+        this.player.addDualAnimation("displayAttackOverlay", { ally: true, slot: this.slot }, 0)
+        this.player.addDualAnimation("displayAvatarAttacked", { ally: true }, 0)
         //pause
-        this.player.addAnimation("wait", {}, 400)
-        this.enemyPlayer.addAnimation("wait", {}, 400)
+        this.player.addDualAnimation("wait", {}, 400)
 
-        this.player.addAnimation("hideAttackOverlay", {}, 0)
-        this.game.players[target.id].addAnimation("hideAvatarAttacked", { ally: true }, 0)
-        this.enemyPlayer.addAnimation("hideAttackOverlay", {}, 0)
-        this.game.players[+!target.id].addAnimation("hideAvatarAttacked", { ally: false }, 0)
+        this.player.addDualAnimation("hideAttackOverlay", {}, 0)
+        this.player.addDualAnimation("hideAvatarAttacked", {ally: false}, 0)
         target.takeDamage(this, this.outgoingAttack)
         this.attacking = false
         this.hasAttacked = true
@@ -199,22 +196,46 @@ class Card {
         }
     }
     checkUpdates() {
-        if (this.outgoingHP != this.prevHP || this.outgoingAttack != this.prevAttack||!util.arrsEqual(this.prevKeywords,this,this.outgoingKeywords)) {
-            this.player.addAnimation("updateBoardCardData", { ally: true, slot: this.slot, value: this.getSendableCopy() })
-            this.enemyPlayer.addAnimation("updateBoardCardData", { ally: false, slot: this.slot, value: this.getSendableCopy() })
+        if (this.type == "spell") {
+            if (
+                this.prevGeoCost != this.outgoingGeoCost ||
+                this.prevSoulCost != this.outgoingSoulCost
+            ) {
+                this.player.addAnimation("updateHandCardData", { pos: this.player.hand.indexOf(this), value: this.getSendableCopy() })
+            }
+            this.prevGeoCost = this.outgoingGeoCost
+            this.prevSoulCost = this.outgoingSoulCost
+        } else {
+            if (
+                this.outgoingHP != this.prevHP ||
+                this.outgoingAttack != this.prevAttack ||
+                !util.arrsEqual(this.prevKeywords, this.outgoingKeywords) ||
+                this.prevGeoCost != this.outgoingGeoCost
+            ) {
+                console.log(this.outgoingHP, this.prevHP)
+                console.log(this.outgoingAttack, this.prevAttack)
+                console.log(this.prevKeywords, this.outgoingKeywords, util.arrsEqual(this.prevKeywords, this.outgoingKeywords))
+                console.log(this.prevGeoCost,this.outgoingGeoCost)
+                if (this.zone == "board") {
+                    this.player.addAnimation("updateBoardCardData", { ally: true, slot: this.slot, value: this.getSendableCopy() })
+                    this.enemyPlayer.addAnimation("updateBoardCardData", { ally: false, slot: this.slot, value: this.getSendableCopy() })
+                } else if (this.zone == "hand") {
+                    this.player.addAnimation("updateHandCardData", { pos: this.player.hand.indexOf(this), value: this.getSendableCopy() })
+                }
+            }
+            if (this.outgoingHP <= 0) {
+                this.die()
+            }
+            this.prevHP = this.outgoingHP
+            this.prevAttack = this.outgoingAttack
+            this.prevKeywords = this.outgoingKeywords
+            this.prevGeoCost = this.outgoingGeoCost
         }
-        if (this.outgoingHP <= 0) {
-            this.die()
-        }
-        this.prevHP = this.outgoingHP
-        this.prevAttack = this.outgoingAttack
-        this.prevKeywords = this.outgoingKeywords
     }
     die() {
         this.player.slots[this.slot] = null
         this.zone = "death"
-        this.player.addAnimation("awaitDeath", { ally: true, slot: this.slot }, 300)
-        this.enemyPlayer.addAnimation("awaitDeath", { ally: false, slot: this.slot }, 300)
+        this.player.addDualAnimation("awaitDeath", { ally: true, slot: this.slot }, 300)
         this.listenerEmitter.emitPassiveEvent({ monster: this }, "triggerDieEvents")
         this.player.listenerEmitter.emitPassiveEvent({ monster: this }, "allyDied")
     }
@@ -279,8 +300,7 @@ class Card {
     setupSummon(slot) {
         this.slot = slot
         this.zone = "board"
-        this.enemyPlayer.addAnimation("enemySummonCharacter", { card: this.getSendableCopy(), slot }, 0)
-        this.player.addAnimation("summonCharacter", { card: this.getSendableCopy(), slot }, 0)
+        this.player.addDualAnimation("summonCharacter", { card: this.getSendableCopy(), slot }, 0)
         this.performSetup()
     }
     //Spell only

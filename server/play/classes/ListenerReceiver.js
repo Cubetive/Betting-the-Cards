@@ -4,8 +4,8 @@ class ListenerReceiver {
       //Handlers must be named.
       this.eventHandlers = {}
     }
-    addEventHandler(name, func, isProperEvent, emitter) {
-        this.eventHandlers[name] = new Listener(func, isProperEvent,name)
+    addEventHandler(name, func, isProperEvent, emitter,skipStack=false) {
+        this.eventHandlers[name] = new Listener(func, isProperEvent,skipStack)
         emitter.registerListener(this.eventHandlers[name])
         return this.eventHandlers[name]
     }

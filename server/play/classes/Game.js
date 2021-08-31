@@ -33,6 +33,18 @@ class Game {
             this.evalNextStackEntry()
         }
     }
+    checkCardsForUpdates() {
+        for (let i = 0; i < this.players.length; i++) {
+            for (let j = 0; j < this.players[i].slots.length; j++) {
+                if (this.players[i].slots[j] != null) {
+                    this.players[i].slots[j].checkUpdates()
+                }
+            }
+            for (let j = 0; j < this.players[i].hand.length; j++) {
+                this.players[i].hand[j].checkUpdates()
+            }
+        }
+    }
     sendAnimations() {
         for (let i = 0; i < this.players.length; i++) {
             this.players[i].sendAnimations()

@@ -46,6 +46,12 @@ function handleNextAnimation(animations, cardData) {
                 }
             }
             break
+        case "updateHandCardData":
+            card = App.hand[data.pos];
+            for (const [key, value] of Object.entries(data.value)) {
+                Vue.set(card, key, value)
+            }
+            break
         case "setID":
             App.ID = data.id
             break
@@ -102,12 +108,13 @@ function handleNextAnimation(animations, cardData) {
             break
         //boardRelated
         case "summonCharacter":
-            Vue.set(App.allySlots, data.slot, data.card)
-            Vue.set(App.allySlots[data.slot], 'cardFrameState', 'normal')
-            break
-        case "enemySummonCharacter":
-            Vue.set(App.enemySlots, data.slot, data.card)
-            Vue.set(App.enemySlots[data.slot], 'cardFrameState', 'normal')
+            if (data.card.team == App.ID) {
+                Vue.set(App.allySlots, data.slot, data.card)
+                Vue.set(App.allySlots[data.slot], 'cardFrameState', 'normal')
+            } else {
+                Vue.set(App.enemySlots, data.slot, data.card)
+                Vue.set(App.enemySlots[data.slot], 'cardFrameState', 'normal')
+            }
             break
         case "awaitDeath":
             if (data.ally) {

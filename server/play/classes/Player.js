@@ -260,7 +260,7 @@ class Player {
         )
         this.animationsToSend = []
     }
-    addAnimation(type, data, time = 0) {
+    addAnimation(type, data, time = 0,overrideUpdateCards = false) {
         if (this.animationsLocked) {
             return
         }
@@ -284,7 +284,7 @@ class Player {
                     //move this to the end
                     this.animationsToSend = (this.animationsToSend.slice(0, i).concat(this.animationsToSend.slice(i + 1, this.animationsToSend.length))).concat(curAnim)
                     break
-                } else if (curAnim.type != "updateBoardCardData"||i==0) {
+                } else if ((curAnim.type != "updateBoardCardData" && curAnim.type != "updateHandCardData") || i == 0) {
                     foundPrevAnim = false
                     break
                 }
@@ -295,10 +295,25 @@ class Player {
         } else {
             this.animationsToSend.push(animation)
         }
+        if (type != "updateBoardCardData"&&type!="updateHandCardData"&&this.game.started&&!overrideUpdateCards) {
+            this.game.checkCardsForUpdates()
+        }
     }
     addDualAnimation(type, data, time = 0) {
-        this.addAnimation(type, data, time)
-        this.enemyPlayer.addAnimation(type,data,time)
+        this.addAnimation(type, data, time, true)
+        let newData = {};
+        if (data.ally) {
+            for (const [key, value] of Object.entries(data)) {
+                newData[key] = value
+            }
+            newData.ally = !data.ally
+            this.enemyPlayer.addAnimation(type, newData, time,true)
+        } else {
+            this.enemyPlayer.addAnimation(type, data, time,true)
+        }
+        if (type != "updateBoardCardData" && type != "updateHandCardData" && this.game.started) {
+            this.game.checkCardsForUpdates()
+        }
     }
     startTurn() {
         this.addAnimation("beginTurn", {}, 0)
@@ -386,7 +401,7 @@ class Player {
             this.addEnemyAnimation("updateEnemyCards", { value: this.hand.length })
             this.summonCharacter(card, slotPos, true)
         }
-        this.listenerEmitter.emitPassiveEvent({ card: card },"cardPlayed")
+        this.listenerEmitter.emitPassiveEvent({ card: card },"allyCardPlayed")
     }
     playSpell(cardPos) {
         if (cardPos >= this.hand.length) {
@@ -425,7 +440,7 @@ class Player {
             this.addEnemyAnimation("updateEnemyCards", { value: this.hand.length })
             this.castSpell(card, true)
         }
-        this.listenerEmitter.emitPassiveEvent({ card: card }, "cardPlayed")
+        this.listenerEmitter.emitPassiveEvent({ card: card }, "allyCardPlayed")
     }
     castSpell(spell, played = false, target = null) {
         spell.zone = "void"

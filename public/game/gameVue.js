@@ -113,6 +113,9 @@ const App = new Vue({
 			if (this.hand[i].cardFrameState == 'highlighted') {
 				style["cursor"] = "pointer"
 			}
+			if (i == this.heldCard) {
+				style["z-index"]=9999
+            }
 			return style
 		},
 		getCardData: function (cardName) {

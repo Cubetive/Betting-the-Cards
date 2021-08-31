@@ -45,7 +45,8 @@ SetupSummon -> Summon -> PlayEffects
 However, we would probably already have to do that to setup monster effects.
 I'm going to tentatively go with 3.
 
-To allow listeners to remove themself, the listner is passed in as a seconday argument to all events. feel free to ignore it.
+
+For purposes of emitting events when listeners are added / removed, listener.isValidEvent should only depend on the name.
  **/
 const Listener = require('./Listener.js').Listener
 /*Event format:
@@ -54,24 +55,34 @@ const Listener = require('./Listener.js').Listener
  * Name of event is stored in eventData.name
  **/
 class ListenerEmitter {
-    constructor(game){
+    constructor(game) {
         this.listeners = []
         this.pastEvents = []
         this.game = game
     }
     //Hey, this just happened. Who cares about that?
-    emitPassiveEvent(eventData,eventName) {
+    emitPassiveEvent(eventData, eventName) {
+        if (!listenerData[eventName]) {
+            console.log("No explanation found for event " + eventName + ". Did you create a new event and forget to add it?")
+        }
         let data = {
-            data:eventData,
+            data: eventData,
             name: eventName,
-            eventType:0
+            eventType: 0
         }
         for (let i = 0; i < this.listeners.length; i++) {
-            this.game.addToStack(() => { return this.listeners[i].handleEvent(data) })
+            if (!this.listeners[i].skipStack) {
+                this.game.addToStack(() => { return this.listeners[i].handleEvent(data) })
+            } else {
+                this.listeners[i].handleEvent(data)
+            }
         }
     }
     //Hey everyone, do you have any data of this type for me, and if so what?
-    emitDataRequestEvent(eventData,eventName) {
+    emitDataRequestEvent(eventData, eventName) {
+        if (!listenerData[eventName]) {
+            console.log("No explanation found for event " + eventName + ". Did you create a new event and forget to add it?")
+        }
         dataResults = []
         let data = {
             data: eventData,
@@ -87,7 +98,10 @@ class ListenerEmitter {
         return data;
     }
     //Hey, I have this variable here. Who wants to change it?
-    emitModifiableEvent(eventData,eventName,modifiable) {
+    emitModifiableEvent(eventData, eventName, modifiable) {
+        if (!listenerData[eventName]) {
+            console.log("No explanation found for event " + eventName + ". Did you create a new event and forget to add it?")
+        }
         let data = {
             data: eventData,
             name: eventName,
@@ -102,110 +116,140 @@ class ListenerEmitter {
         }
         return data.modifiable
     }
-    registerListener(listener){
+    registerListener(listener) {
         this.listeners.push(listener)
     }
-    removeListener(listenerToRemove){
-        for(let i=0;i<this.listeners.length;i++){
-            if(this.listeners[i]==listenerToRemove){
+    removeListener(listenerToRemove) {
+        for (let i = 0; i < this.listeners.length; i++) {
+            if (this.listeners[i] == listenerToRemove) {
                 this.listeners.splice(i, 1)
                 return
             }
         }
     }
 }
-module.exports = { ListenerEmitter}
-/*
- * comprehensive guide of all event listners in game. If you want to add a new one, log it here.
- * allyToAttack: 
- *      Emitter:
- *          Player emitter
- *      Trigger Condition: 
- *          triggers when an ally monster is about to attack.
- *      Type: 
- *          passiveEvent
- * allyAttacked:
+listenerData = {
+    allyToAttack: `
+ *     Emitter:
+ *        Player emitter
+ *     Trigger Condition: 
+ *        triggers when an ally monster is about to attack.
+ *     Type: 
+ *         passiveEvent `,
+    allyAttacked: `
  *      Emitter:
  *          Player emitter
  *      Trigger Condition:
  *          triggers after an ally attacks.
  *      Type:
- *          passiveEvent
- * allyDied:
+ *          passiveEvent`,
+    allyDied: `
  *      Emitter:
  *          Player emitter
  *      Trigger Condition:
  *          an ally monster died.
  *      Type:
- *          passiveEvent
- * triggerPlayEffects:
+ *          passiveEvent`,
+    triggerPlayEvents: `
  *      Emitter:
  *          Card emitter
  *      Trigger Condition:
  *          An monster should trigger play effects now.
  *      Type:
- *          passiveEvent
- * triggerDieEffects:
+ *          passiveEvent`,
+    triggerDieEffects: `
  *      Emitter:
  *          Card emitter
  *      Trigger Condition:
  *          An monster should trigger die effects now.
  *      Type:
- *          passiveEvent
- * triggerGameStartEffects:
+ *          passiveEvent`,
+    triggerGameStartEffects: `
  *      Emitter:
  *          Card emitter
  *      Trigger Condition:
  *          A card should trigger game start effects now.
  *      Type:
- *          passiveEvent
- * triggerTurnEndEffects:
+ *          passiveEvent`,
+    triggerTurnEndEvents: `
  *      Emitter:
  *          Card emitter
  *      Trigger Condition:
  *          A cardr should trigger play effects now.
  *      Type:
- *          passiveEvent
- * modifyCardPlayable:
+ *          passiveEvent`,
+    modifyCardPlayable: `
  *      Emitter:
  *          Card/Game emitter
  *      Trigger Condition:
  *          A card wants to check for updates to if it is playable
  *      Type:
- *          dataModifiableEvent
- * modifyCardGeoCost:
+ *          dataModifiableEvent`,
+    modifyCardGeoCost: `
  *      Emitter:
  *          Card/Game emitter
  *      Trigger Condition:
  *          A card wants to check for updates to it's geo cost
  *      Type:
- *          dataModifiableEvent
- * modifyCardSoulCost:
+ *          dataModifiableEvent`,
+    modifyCardSoulCost: `
  *      Emitter:
  *          Card/Game emitter
  *      Trigger Condition:
  *          A card wants to check for updates to it's soul cost
  *      Type:
- *          dataModifiableEvent
- * modifyCardHP:
+ *          dataModifiableEvent`,
+    modifyCardHP: `
  *      Emitter:
  *          Card/Game emitter
  *      Trigger Condition:
  *          A card wants to check for updates to it's hp
  *      Type:
- *          dataModifiableEvent
- * modifyCardAttack:
+ *          dataModifiableEvent`,
+    modifyCardAttack: `
  *      Emitter:
  *          Card/Game emitter
  *      Trigger Condition:
  *          A card wants to check for updates to it's attack
  *      Type:
- *          dataModifiableEvent
- * modifyCardKeywords:
+ *          dataModifiableEvent`,
+    modifyCardKeywords: `
  *      Emitter:
  *          Card/Game emitter
  *      Trigger Condition:
  *          A card wants to check for updates to it's keywords
  *      Type:
- *          dataModifiableEvent
+ *          dataModifiableEvent`,
+    listenerAdded: `
+ *      Emitter:
+ *          No source.
+ *      Trigger Condition:
+ *          A listener was added
+ *      Type:
+ *          passiveEvent`,
+    listenerRemoved: `
+ *      Emitter:
+ *          No source.
+ *      Trigger Condition:
+ *          A listener was removed
+ *      Type:
+ *          passiveEvent`,
+    cardZoneChange: `
+ *      Emitter:
+ *          Card emitter.
+ *      Trigger Condition:
+ *          A card's zone changed.
+ *      Type:
+ *          passiveEvent`,
+    allyCardPlayed: `
+ *      Emitter:
+ *          Card emitter.
+ *      Trigger Condition:
+ *          An ally card has been played.
+ *      Type:
+ *          passiveEvent`
+}
+module.exports = { ListenerEmitter }
+/*
+ * comprehensive guide of all event listeners in game. If you want to add a new one, log it here.
  */

@@ -73,5 +73,6 @@ const arrsEqual = function(arr1, arr2){
             return false
         }
     }
+    return true
 }
 module.exports = {stripDuplicates,shuffle,weightedRandomChance,getRandomCards,convertToDeck,targetsEmpty,arrsEqual}
