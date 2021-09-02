@@ -1,9 +1,10 @@
-let exampleSocket = new WebSocket("ws:/127.0.0.1:3000");
+var HOST = location.origin.replace(/^http/, 'ws')
+var exampleSocket = new WebSocket(HOST);
 exampleSocket.onmessage = function (event) {
 }
 exampleSocket.onopen = function (event) {
-    sendThroughWebSocket(JSON.stringify({ type: 'verifyIdentity', loginID: localStorage.loginID, username: localStorage.username, page: 'game.html' }));
-    sendThroughWebSocket(JSON.stringify({ type: 'loadAllCards' }));
+    sendThroughWebSocket(JSON.stringify({ type: 'verifyIdentity', loginID: localStorage.loginID, username: localStorage.username, page: 'game.html',socketType:"gameWS" }));
+    sendThroughWebSocket(JSON.stringify({ type: 'loadAllCards',socketType:"gameWS" }));
 };
 exampleSocket.onmessage = function (message) {
     let data = JSON.parse(message.data)

@@ -27,6 +27,9 @@ class Database {
         this.playerInGame = playerInGame
     }
     save() {
+        for (const [key, value] of Object.entries(this.data.players)) {
+            this.data.players[key].activeGame = null
+        }
         fs.writeFileSync(`./data.json`, JSON.stringify(this.data))
     }
     //ACCOUNT STUFF
@@ -217,6 +220,7 @@ class Database {
                 console.log(e)
             }
         });
+        console.log("adding websocket")
     }
     enterQueue(player, deckID) {
         if (!this.isDeckValid(player.decks[deckID]) || this.queue.includes(player.name) || this.playerInGame(player.name)) {
@@ -261,7 +265,7 @@ class Database {
         }
         return false
     }
-    updateSockets(player) {
+    updateSockets() {
         for (let i = 0; i < this.sockets.length; i++) {
             if (this.sockets[i].readyState != 1) {
                 this.sockets[i].close()
@@ -279,9 +283,10 @@ class Database {
             switch (message.type) {
                 case "newAccount":
                     if (this.newPlayer(messageData.username, messageData.password)) {
-                        socket.send(JSON.stringify({ successful: true, username: messageData.username, loginID: this.data.players[messageData.username].loginID }))
+                        socket.send(JSON.stringify({ type:"registerResults",successful: true, username: messageData.username, loginID: this.data.players[messageData.username].loginID }))
+                        console.log("adding new player")
                     } else {
-                        socket.send(JSON.stringify({ successful: false }))
+                        socket.send(JSON.stringify({ type: "registerResults",successful: false }))
                     }
                     break
                 case "login":
@@ -359,7 +364,10 @@ class Database {
                     }
                     break
                 case "saveServer":
-                    this.save()
+                    if (socket.owner&&socket.owner=="eagleclaw774") {
+                        this.save()
+                        break
+                    }
                     break
                 default:
                     break
