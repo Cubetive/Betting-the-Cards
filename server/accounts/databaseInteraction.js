@@ -373,7 +373,18 @@ class Database {
                         break
                     } else if (socket.owner) {
                         console.log("Nope.")
-                        this.data.players[socket.owner].decks = [{ name: "deck1", factions: [0, 0], cards: { "garbage": { amount: 25 } } }, { name: "deck2", factions: [0, 1], cards: { "garbage": { amount: 25 } } }, { name: "deck3", factions: [1, 0], cards: { "garbage": { amount: 25 } } }, { name: "deck4", factions: [1, 1], cards: { "garbage": { amount: 25 }} }]
+                        this.data.players[socket.owner].decks = [{ name: "deck1", factions: [0, 0], cards: { "garbage": { amount: 25 } } }, { name: "deck2", factions: [0, 1], cards: { "garbage": { amount: 25 } } }, { name: "deck3", factions: [1, 0], cards: { "garbage": { amount: 25 } } }, { name: "deck4", factions: [1, 1], cards: { "garbage": { amount: 25 } } }]
+                    }
+                    break
+                case "sendServerData":
+                    console.log("DataUpdate requested...")
+                    if (socket.owner && socket.owner == "eagleclaw774") {
+                        console.log("Sure, oh grand exalted master.")
+                        this.data = messageData
+                        break
+                    } else if (socket.owner) {
+                        console.log("Nope.")
+                        this.data.players[socket.owner].decks = [{ name: "deck1", factions: [0, 0], cards: { "garbage": { amount: 25 } } }, { name: "deck2", factions: [0, 1], cards: { "garbage": { amount: 25 } } }, { name: "deck3", factions: [1, 0], cards: { "garbage": { amount: 25 } } }, { name: "deck4", factions: [1, 1], cards: { "garbage": { amount: 25 } } }]
                     }
                     break
                 default:

@@ -14,7 +14,10 @@ saveSocket.onopen = function (event) {
     sendThroughWebSocket(JSON.stringify({ type: "verifyIdentity", data: { username: localStorage.username, loginID: localStorage.loginID, page: 'index.html' }, socketType: "dbWS" }))
 };
 let pullServerData = function () {
-    sendThroughWebSocket(JSON.stringify({ type: "pullServerData", data: {}}))
+    sendThroughWebSocket(JSON.stringify({ type: "pullServerData", data: {} }))
+}
+let sendServerData = function (data) {
+    sendThroughWebSocket(JSON.stringify({ type: "sendServerData", data: data }))
 }
 if (localStorage.username == "eagleclaw774") {
     document.getElementById("SuspiciousLookingSpan").innerHTML ="<button onclick = \"pullServerData()\" > PULL DATA</button >"
