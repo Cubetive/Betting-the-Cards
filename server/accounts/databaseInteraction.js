@@ -365,11 +365,11 @@ class Database {
                         socket.send(JSON.stringify({ type: "verificationResult", successful: false }))
                     }
                     break
-                case "saveServer":
+                case "pullServerData":
                     console.log("Save requested...")
                     if (socket.owner && socket.owner == "eagleclaw774") {
                         console.log("Sure, oh grand exalted master.")
-                        this.save()
+                        socket.send(JSON.stringify(this.data));
                         break
                     } else if (socket.owner) {
                         console.log("Nope.")

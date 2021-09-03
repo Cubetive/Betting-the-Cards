@@ -7,13 +7,15 @@ let sendThroughWebSocket = function (message) {
         alert('You have been disconnected from the server. Please close or reload the page.')
     }
 }
+saveSocket.onmessage = function (message) {
+    console.log(message)
+};
 saveSocket.onopen = function (event) {
     sendThroughWebSocket(JSON.stringify({ type: "verifyIdentity", data: { username: localStorage.username, loginID: localStorage.loginID, page: 'index.html' }, socketType: "dbWS" }))
 };
-let submitSave = function () {
-    sendThroughWebSocket(JSON.stringify({ type: "saveServer", data: {}}))
+let pullServerData = function () {
+    sendThroughWebSocket(JSON.stringify({ type: "pullServerData", data: {}}))
 }
 if (localStorage.username == "eagleclaw774") {
-    
-    document.getElementById("SuspiciousLookingSpan").innerHTML="<button onclick = \"submitSave()\" > SAVE SERVER</button >"
+    document.getElementById("SuspiciousLookingSpan").innerHTML ="<button onclick = \"pullServerData()\" > PULL DATA</button >"
 }
