@@ -315,12 +315,15 @@ class Card {
             this.publicKeywords = this.outgoingKeywords
         }
         let emitter = this.listenerEmitter
+        let receiver = this.listenerReceiver
         this.isCardPlayable = this.isPlayable
         this.game = undefined
         this.listenerEmitter = undefined
+        this.listenerReceiver = undefined
         let toReturn = JSON.parse(JSON.stringify(this))
         this.game = game
         this.listenerEmitter = emitter
+        this.listenerReceiver = receiver
         this.isCardPlayable = null
         this.publicGeoCost = null
         this.publicSoulCost = null
