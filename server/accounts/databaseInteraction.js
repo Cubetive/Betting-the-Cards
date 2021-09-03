@@ -258,6 +258,9 @@ class Database {
                 return this.sockets[i]
             } else if (this.sockets[i].owner == player) {
                 this.sockets[i].close()
+                if (this.queue.includes(player.name)) {
+                    this.queue.splice(this.queue.index(player.name),1)
+                }
                 this.sockets.splice(i, 1)
                 i -= 1
             }
