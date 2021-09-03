@@ -391,7 +391,7 @@ const cardList = {
             this.removeAuraListener = this.listenerReceiver.addEventHandler(
                 "GrubFatherRemoveAuras",
                 () => {
-                    if (data.newZone != "board") {
+                    if (data.newZone != "board") { 
                         this.game.listenerEmitter.removeListener(this.removeAuraListener)
                         this.game.listenerEmitter.removeListener(this.modifyCardAttackListener)
                         this.game.listenerEmitter.removeListener(this.modifyCardHPListener)
