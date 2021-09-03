@@ -3,7 +3,8 @@
 <head>
     <title>Hollow Cards</title>
     <meta charset="UTF-8">
-    <link rel="stylesheet" type="text/css" href="css/global.css"></link>
+    <link rel="stylesheet" type="text/css" href="css/global.css" />
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
     <script defer src="index/saveServer.js"></script>
     <script defer src="navBar.js"></script>
 </head>
@@ -14,6 +15,39 @@
     <div id="navBar">
     </div>
     <span id="SuspiciousLookingSpan"></span>
-    <!--button onclick="submitSave()">SAVE SERVER</!-button>-->
+    <div class="descriptionText">
+        Since making tutorials is a bad way to teach people how to play a game (read: it’s hard to code), I’m just going to dump a bunch of information on this page with absolutely no other content on it.<br />
+        Firstly, general mechanics.<br />
+        The main currency of the game is geo. You gain 1 geo a turn and geo stacks over time (subject to change). The secondary currency of the game is soul, which is used exclusively (currently) on spells. Spells have a second cost box below their geo cost box, which represents soul cost. You need to also have the required amount of soul to play them. How do you get soul? Some cards will just give you soul though their effects. However, the main way is pretty simple. Whenever an ally monster attacks or dies, you gain 1 soul. Like geo, soul does not go away over time, instead you keep it until you use it.<br />
+        The attacking system is similar to hs/undercards (it’s identical). So is the fatigue system.<br />
+        Deck size limits have not been added yet due to the incredibly small card pool, and all decks are legal. There is exactly one queue, and it always matches players as soon as it can. There may be a moderate amount of lag due to the free hosting system I’m using.<br />
+        In terms of cards, nothing for the game’s final balance is fleshed out or set in stone yet. All cards have a description, but not all cards have actually been implemented. The following cards are implemented:<br />
+        Seer<br />
+        Grubfather<br />
+        BOOM BOOM<br />
+        trolling...<br />
+        Focus<br />
+        Slash<br />
+        Loan Shark<br />
+        Nop dyne<br />
+        False knight<br />
+        Seer<br />
+        Vengeful spirit.<br />
+        Dream Nail<br />
+        <br />
+        Everything else has no effect, regardless of any text on the card. Most of these cards were made to show what they system I’m using can do. For each of them, here are the reasons I’ve implemented:<br />
+        Grubfather: Stat auras. Enough said.<br />
+        BOOM BOOM + Dream nail: Stack system. Dream nail won’t draw a card if you have multiple dream nails out and play BOOM BOOM, because the UC system has no stack, and it sucks. (To clarify, all effects use a stack except certain auras. While an effect is resolving, nothing else can resolve until it completely finishes resolving, so the dream nails can’t trigger to draw a card until BOOM BOOM finishes killing them all.)<br />
+        trolling…: testing purposes + start of game effect.<br />
+        Focus: Targeting v1.0<br />
+        Slash: Multitargeting owo<br />
+        Loan Shark: This card was only made because I was making the system and thought: “Hey, I could make this and it would be funny.” So, I made it.<br />
+        Nop Dyne: An effect that triggers from in the deck. An idea for original copdyne that was rejected because uncodeable, hence the name. Anyway, guess what? It’s codeable now.<br />
+        False knight: Magic effects v1.0<br />
+        Seer: Targeted monster effects v1.0<br />
+        Vengeful spirit: Both a spell, and also useful for testing purposes.<br />
+        To test out the system, use a test account in an incognito window. The two test accounts are Steve and John. Their password is password<br />
+        They both start with simple prebuilt decks for testing purposes.<br /><br /><br /><br /><br />
+    </div>
 </body>
 </html>

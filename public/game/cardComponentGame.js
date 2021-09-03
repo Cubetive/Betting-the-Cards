@@ -118,7 +118,7 @@ Vue.component('card', {
         <div class = "cardAbility">
           <span v-for="part in card.baseText">
             <span v-if="part.type=='plainText'">{{part.value}}</span>
-            <span v-if="part.type=='cardName'" style="color:darkblue" v-on:mouseover="setTempCard(part.name)" v-on:mouseleave="tempCard=null">{{part.value}}</span>
+            <span v-if="part.type=='cardName'" style="color:blue" v-on:mouseover="setTempCard(part.name)" v-on:mouseleave="tempCard=null">{{part.value}}</span>
           </span>
         </div>
         <div class = "cardSoulCost">{{card.publicSoulCost}}</div>

@@ -74,6 +74,9 @@ class Card {
                 playable = false
             }
         }
+        if (!this.player.hasEmptySlot && this.type == "character") {
+            playable = false
+        }
         return playable
     }
     get outgoingGeoCost() {
@@ -159,7 +162,7 @@ class Card {
         this.player.listenerEmitter.emitPassiveEvent({ monster: this, targetType: "monster", target }, "allyToAttack")
         //display attack markers
         this.player.addDualAnimation("displayAttackOverlay", { ally: true, slot: this.slot }, 0)
-        this.player.addDualAnimation("displayAvatarAttacked", { ally: true }, 0)
+        this.player.addDualAnimation("displayAvatarAttacked", { ally: false }, 0)
         //pause
         this.player.addDualAnimation("wait", {}, 400)
 
@@ -332,6 +335,13 @@ class Card {
         for (const [key, value] of Object.entries(dataToLoad)) {
             this[key] = value
         }
+    }
+    removeAllListeners() {
+        let eventHandlers = this.listenerReceiver.eventHandlers;
+        for (const [key, value] of Object.entries(eventHandlers)) {
+            value[1].removeListener(value[0])
+        }
+        this.listenerReceiver.eventHandlers = {}
     }
 }
 module.exports = { Card }

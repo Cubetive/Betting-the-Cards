@@ -17,9 +17,9 @@
   <div id = "app">
     <div :class = "getSelectable(card)" v-on:click = "addToDeck(card)" v-for="(card,i) in relevantCollection.slice(collectionPage*8,collectionPage*8+8)">
       <div class = "card" v-if="allCardList[card[0]].type=='character'" :style="{'top':calcY(i),'left':calcX(i)}">
-        <img src = "images/cardFrameCollection.png"/>
+        <img src = "images/CardFrameCollection.png"/>
         <div class = "cardName">{{card[0]}}</div>
-        <div class = "cardCost">{{allCardList[card[0]].cost}}</div>
+        <div class = "cardCost">{{allCardList[card[0]].geoCost}}</div>
         <div class = "cardHP" style = "color:green">{{allCardList[card[0]].origHP}}</div>
         <div class = "cardAttack" style="color:red">{{allCardList[card[0]].origAttack}}</div>
         <div class = "cardAbility">
@@ -42,9 +42,9 @@
         <div class = "cardAmount">x{{getAmountRemaining(card[0],card[1].amount)}}</div>
       </div>
       <div class = "card" v-if="allCardList[card[0]].type=='spell'" :style="{'top':calcY(i),'left':calcX(i)}">
-        <img src = "images/spellCardFrameCollection.png"/>
+        <img src = "images/SpellCardFrameCollection.png"/>
         <div class = "cardName">{{card[0]}}</div>
-        <div class = "cardCost">{{allCardList[card[0]].cost}}</div>
+        <div class = "cardCost">{{allCardList[card[0]].geoCost}}</div>
         <div class = "cardAbility">
           <span v-for="part in allCardList[card[0]].baseText">
             <span v-if="part.type=='plainText'">{{part.value}}</span>
@@ -82,9 +82,9 @@
     v-on:mouseleave="tempDisplayCard=null">{{cardName}}<span class='cardNumber'>{{card.amount}}</span></div>
     <div v-if="tempDisplayCard!=null">
       <div class = "temporaryCard" v-if="tempDisplayCard.card.type=='character'" :style="{'top':tempDisplayCard.y,'left':tempDisplayCard.x}">
-        <img src = "images/cardFrame.png"/>
+        <img src = "images/CardFrame.png"/>
         <div class = "cardName">{{tempDisplayCard.name}}</div>
-        <div class = "cardCost">{{tempDisplayCard.card.cost}}</div>
+        <div class = "cardCost">{{tempDisplayCard.card.geoCost}}</div>
         <div class = "cardHP" style = "color:green">{{tempDisplayCard.card.origHP}}</div>
         <div class = "cardAttack" style="color:red">{{tempDisplayCard.card.origAttack}}</div>
         <div class = "cardAbility">
@@ -106,13 +106,13 @@
         </div>
       </div>
       <div class = "temporaryCard" v-if="tempDisplayCard.card.type=='spell'" :style="{'top':tempDisplayCard.y,'left':tempDisplayCard.x}">
-        <img src = "images/spellCardFrame.png"/>
+        <img src = "images/SpellCardFrame.png"/>
         <div class = "cardName">{{tempDisplayCard.name}}</div>
-        <div class = "cardCost">{{tempDisplayCard.card.cost}}</div>
+        <div class = "cardCost">{{tempDisplayCard.card.geoCost}}</div>
         <div class = "cardAbility">
           <span v-for="part in tempDisplayCard.card.baseText">
             <span v-if="part.type=='plainText'">{{part.value}}</span>
-            <span v-if="part.type=='cardName'" style="color:darkblue" v-on:mouseover="onMouseOverCollection(part.name,i)">{{part.value}}</span>
+            <span v-if="part.type=='cardName'" style="color:blue" v-on:mouseover="onMouseOverCollection(part.name,i)">{{part.value}}</span>
           </span>
         </div>
         <div class = "cardSoulCost">{{tempDisplayCard.card.soulCost}}</div>

@@ -90,8 +90,6 @@ const cardList = {
         baseText: [{ type: "plainText", value: "This text will show " },
         { type: "cardName", name: "Demo Card", value: "Demo Card" },
         { type: "plainText", value: " when you hover over it." }],
-        //Ignore this part, it's going to be removed eventually.
-        dreamVariant: 'Failed Champion',
         //Where is the image for this card found?
         imageLink: "",
         //What rarity is this card? -1 means token so it can't be added to decks.
@@ -172,7 +170,6 @@ const cardList = {
         geoCost: 5,
         type: "character",
         baseText: [{ type: "plainText", value: "Play: Multiply your geo by 4." }],
-        dreamVariant: 'Failed Champion',
         imageLink: "",
         rarity: 3,
         performSetup: function () {
@@ -327,7 +324,6 @@ const cardList = {
         geoCost: 5,
         type: "character",
         baseText: [{ type: "plainText", value: "After this takes damage, gain dodge(1)." }],
-        dreamVariant: 'Soul Tyrant',
         imageLink: "",
         rarity: 3,
         factions: [2, 2],
@@ -598,6 +594,17 @@ const cardList = {
         rarity: -1,
         factions: [2, 2],
     },
+    "garbage": {
+        origHP: 1,
+        origAttack:0,
+        baseKeywords: [],
+        geoCost: 5,
+        type: "character",
+        baseText: [],
+        imageLink: "",
+        rarity: -1,
+        factions: [2, 2],
+    },
     "Slash": {
         geoCost: 4,
         soulCost: 4,
@@ -689,7 +696,6 @@ const cardList = {
         origAttack: 6,
         baseKeywords: [],
         geoCost: 8,
-        awakenedDreamVariant: "Radiance",
         type: "character",
         baseText: [{ type: "plainText", value: "Play: Deal 1 damage to a random enemy monster for each dead ally monster." }],
         imageLink: "",
@@ -701,7 +707,6 @@ const cardList = {
         origAttack: 6,
         baseKeywords: [],
         geoCost: 7,
-        dreamVariant: "Lost Kin",
         type: "character",
         baseText: [{ type: "plainText", value: "Magic: If the enemy player has more than one mask, deal one damage to them" }],
         imageLink: "",
@@ -813,7 +818,6 @@ const cardList = {
         type: "character",
         baseText: [{ type: "plainText", value: "Play: Look at all monsters in your hand and choose one to summon." }],//NO
         imageLink: "",
-        dreamVariant: 'Godhome',
         rarity: 2,
         factions: [2, 1],
     },
@@ -873,7 +877,6 @@ const cardList = {
         baseText: [{ type: "plainText", value: "Turn end: deal 2 dmg to a random enemy monster." }],
         imageLink: "",
         rarity: 3,
-        dreamVariant: 'White Defender',
         factions: [1, 2],
     },
     "White Defender": {
@@ -918,7 +921,6 @@ const cardList = {
         baseText: [{ type: "plainText", value: "This card appears as though it had +5/+5." }],
         imageLink: "",
         rarity: 3,
-        dreamVariant: 'Grey Prince Zote',
         factions: [1, 2],
     },
     "Grey Prince Zote": {
@@ -974,7 +976,6 @@ const cardList = {
         baseText: [{ type: "plainText", value: "Play: Reduce the geoCost of the most expensive card in your hand by 2." }],
         imageLink: "",
         rarity: 2,
-        awakenedDreamVariant: 'The White Palace',
         factions: [1, 2],
     },
     "The White Palace": {

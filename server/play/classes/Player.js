@@ -68,6 +68,14 @@ class Player {
     get enemyPlayer() {
         return this.game.players[+!this.id]
     }
+    get hasEmptySlot() {
+        for (let i = 0; i < 7; i++) {
+            if (this.slots[i] == null) {
+                return true
+            }
+        }
+        return false
+    }
     addEnemyAnimation(type, data, time) {
         if (!this.game.players) {
             return
@@ -142,7 +150,6 @@ class Player {
         try {
             message = JSON.parse(message)
             if (this.waitingForTarget) {
-                console.log(message)
                 switch (message.type) {
                     case "targetChosen":
                         let save = this.onTargetChosen
@@ -167,7 +174,6 @@ class Player {
             } else {
                 switch (message.type) {
                     case "getHand":
-                        console.log(message)
                         this.webSocket.send(JSON.stringify({ type: sendHand, hand: this.hand }))
                         break;
                     case "endTurn":
@@ -302,7 +308,7 @@ class Player {
     addDualAnimation(type, data, time = 0) {
         this.addAnimation(type, data, time, true)
         let newData = {};
-        if (data.ally) {
+        if (data.ally!=undefined) {
             for (const [key, value] of Object.entries(data)) {
                 newData[key] = value
             }
@@ -457,7 +463,6 @@ class Player {
         this.listenerEmitter.emitPassiveEvent({ spell, played }, "spellCast")
     }
     summonCharacter(card, slot = null, played = false, target = null) {
-        console.log(target)
         if (slot == null) {
             for (let i = 0; i < this.slots.length; i++) {
                 if (this.slots[i] == null) {

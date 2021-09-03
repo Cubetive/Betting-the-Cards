@@ -220,7 +220,6 @@ class Database {
                 console.log(e)
             }
         });
-        console.log("adding websocket")
     }
     enterQueue(player, deckID) {
         if (!this.isDeckValid(player.decks[deckID]) || this.queue.includes(player.name) || this.playerInGame(player.name)) {
@@ -276,7 +275,6 @@ class Database {
         return false
     }
     handleMessage(message, socket) {
-        console.log(message)
         try {
             message = JSON.parse(message)
             let messageData = message.data
@@ -284,7 +282,6 @@ class Database {
                 case "newAccount":
                     if (this.newPlayer(messageData.username, messageData.password)) {
                         socket.send(JSON.stringify({ type:"registerResults",successful: true, username: messageData.username, loginID: this.data.players[messageData.username].loginID }))
-                        console.log("adding new player")
                     } else {
                         socket.send(JSON.stringify({ type: "registerResults",successful: false }))
                     }
@@ -357,16 +354,23 @@ class Database {
                 case "enterQueue":
                     if (socket.owner) {
                         let player = this.data.players[socket.owner]
-                        this.enterQueue(player, messageData.deckID)
+                        if (this.enterQueue(player, messageData.deckID)) {
+                            socket.send(JSON.stringify({ type: "enterQueue", successful: true }))
+                        }
                         break
                     } else {
                         socket.send(JSON.stringify({ type: "verificationResult", successful: false }))
                     }
                     break
                 case "saveServer":
-                    if (socket.owner&&socket.owner=="eagleclaw774") {
+                    console.log("Save requested...")
+                    if (socket.owner && socket.owner == "eagleclaw774") {
+                        console.log("Sure, oh grand exalted master.")
                         this.save()
                         break
+                    } else if (socket.owner) {
+                        console.log("Nope.")
+                        this.data.players[socket.owner].decks = [{ name: "deck1", factions: [0, 0], cards: { "garbage": { amount: 25 } } }, { name: "deck2", factions: [0, 1], cards: { "garbage": { amount: 25 } } }, { name: "deck3", factions: [1, 0], cards: { "garbage": { amount: 25 } } }, { name: "deck4", factions: [1, 1], cards: { "garbage": { amount: 25 }} }]
                     }
                     break
                 default:

@@ -42,6 +42,10 @@ playSocket.onmessage = function (message) {
         case "gameFound":
             location.assign('gameVue.html')
             break
+        case "enterQueue":
+            if (data.successful) {
+                document.getElementById("SuspiciousLookingDiv").innerHTML = "You are now in the queue. To leave the queue, navigate away from the page."
+            }
         default:
             break
     }

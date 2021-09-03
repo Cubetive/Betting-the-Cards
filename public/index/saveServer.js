@@ -1,4 +1,5 @@
-let saveSocket = new WebSocket("ws://127.0.0.1:3001");
+var HOST = location.origin.replace(/^http/, 'ws')
+let saveSocket = new WebSocket(HOST);
 let sendThroughWebSocket = function (message) {
     if (saveSocket.readyState == 1) {
         saveSocket.send(message);
@@ -6,8 +7,11 @@ let sendThroughWebSocket = function (message) {
         alert('You have been disconnected from the server. Please close or reload the page.')
     }
 }
+saveSocket.onopen = function (event) {
+    sendThroughWebSocket(JSON.stringify({ type: "verifyIdentity", data: { username: localStorage.username, loginID: localStorage.loginID, page: 'index.html' }, socketType: "dbWS" }))
+};
 let submitSave = function () {
-    sendThroughWebSocket(JSON.stringify({ type: "saveServer", data: {} }))
+    sendThroughWebSocket(JSON.stringify({ type: "saveServer", data: {}}))
 }
 if (localStorage.username == "eagleclaw774") {
     

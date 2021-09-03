@@ -128,6 +128,9 @@ class ListenerEmitter {
         }
     }
 }
+/*
+ * comprehensive guide of all event listeners in game. If you want to add a new one, log it here.
+ */
 listenerData = {
     allyToAttack: `
  *     Emitter:
@@ -247,9 +250,13 @@ listenerData = {
  *      Trigger Condition:
  *          An ally card has been played.
  *      Type:
+ *          passiveEvent`,
+    spellCast: `
+ *      Emitter:
+ *          Card emitter.
+ *      Trigger Condition:
+ *          An ally spell has been cast.
+ *      Type:
  *          passiveEvent`
 }
 module.exports = { ListenerEmitter }
-/*
- * comprehensive guide of all event listeners in game. If you want to add a new one, log it here.
- */
