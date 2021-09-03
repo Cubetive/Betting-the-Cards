@@ -320,7 +320,13 @@ class Card {
         this.game = undefined
         this.listenerEmitter = undefined
         this.listenerReceiver = undefined
-        let toReturn = JSON.parse(JSON.stringify(this))
+        let toReturn = {}
+        try {
+            toReturn = JSON.parse(JSON.stringify(this))
+        }catch(e){
+            console.log(this)
+            console.log(e)
+        }
         this.game = game
         this.listenerEmitter = emitter
         this.listenerReceiver = receiver
