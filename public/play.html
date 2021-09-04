@@ -19,7 +19,7 @@
       <option v-for="(deck,i) in decks"
       :value="i">{{deck.name}}</option>
     </select>
-    <button v-on:click='enterQueue()'>Enter Queue</button>
+    <button v-on:click='enterQueue()' id="enterQueueButton">Enter Queue</button>
       <div id="SuspiciousLookingDiv"></div>
   </div>
   <script src="play/playWebsocket.js"></script>

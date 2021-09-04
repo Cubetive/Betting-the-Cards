@@ -24,6 +24,10 @@ playSocket.onmessage = function (message) {
                 sendThroughWebSocket(JSON.stringify({
                     type: "getCollectionAndDecks"
                 }))
+                if (data.queueClosed) {
+                    document.getElementById("enterQueueButton").remove()
+                    document.getElementById("SuspiciousLookingDiv").innerHTML = "The queue is currently closed."
+                }
             } else {
                 localStorage.loginID = "loggedOut"
                 localStorage.username = "loggedOut"

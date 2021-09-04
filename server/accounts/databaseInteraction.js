@@ -3,6 +3,8 @@ const fs = require('fs')
 const cardList = require('../play/data/cards.js').cardList
 const rarityList = require('../play/data/rarity.js').rarityList
 const keywords = require('../play/data/keywords.js').keywords
+console.log(process.env.ServerSavePassword)
+console.log(process.env.ServerLoadPassword)
 const retrieve = () => {
     return JSON.parse(fs.readFileSync(`./data.json`))
 }
@@ -23,6 +25,7 @@ class Database {
         this.sockets = []
         this.playerList = Object.keys(this.data.players)
         this.queue = []
+        this.queueClosed = false
         this.beginGame = beginGame
         this.playerInGame = playerInGame
     }
@@ -222,14 +225,14 @@ class Database {
         });
     }
     enterQueue(player, deckID) {
-        if (!this.isDeckValid(player.decks[deckID]) || this.queue.includes(player.name) || this.playerInGame(player.name)) {
+        if (!this.isDeckValid(player.decks[deckID]) || this.queue.includes(player.name) || this.playerInGame(player.name) || this.queueClosed) {
             return false
         }
         player.activeDeck = deckID
         if (this.queue.length >= 1) {
             let socket1 = this.getWebsocket(this.queue[0])
             let socket2 = this.getWebsocket(player.name)
-            if (!socket1 || socket1.page != 'play.html') {
+            if (!socket1 || socket1.page != 'play.html'||!socket.inQueue) {
                 this.queue = [player.name]
                 return true
             }
@@ -306,7 +309,11 @@ class Database {
                         socket.owner = messageData.username
                         socket.verified = true
                         socket.page = messageData.page
-                        socket.send(JSON.stringify({ type: "verificationResult", successful: true, username: messageData.username, loginID: this.data.players[messageData.username].loginID }))
+                        if (socket.page == "play.html") {
+                            socket.send(JSON.stringify({ type: "verificationResult", successful: true, username: messageData.username, loginID: this.data.players[messageData.username].loginID,queueClosed:this.queueClosed }))
+                        } else {
+                            socket.send(JSON.stringify({ type: "verificationResult", successful: true, username: messageData.username, loginID: this.data.players[messageData.username].loginID }))
+                        }
                     } else {
                         socket.send(JSON.stringify({ type: "verificationResult", successful: false }))
                     }
@@ -359,6 +366,7 @@ class Database {
                         let player = this.data.players[socket.owner]
                         if (this.enterQueue(player, messageData.deckID)) {
                             socket.send(JSON.stringify({ type: "enterQueue", successful: true }))
+                            socket.inQueue = true
                         }
                         break
                     } else {
