@@ -23,7 +23,7 @@ class Database {
         this.sockets = []
         this.playerList = Object.keys(this.data.players)
         this.queue = []
-        this.queueClosed = false
+        this.queueClosed = true
         this.beginGame = beginGame
         this.playerInGame = playerInGame
     }
@@ -223,6 +223,7 @@ class Database {
         });
     }
     enterQueue(player, deckID) {
+        console.log(this.queueClosed)
         if (!this.isDeckValid(player.decks[deckID]) || this.queue.includes(player.name) || this.playerInGame(player.name) || this.queueClosed) {
             return false
         }
@@ -373,7 +374,9 @@ class Database {
                     break
                 case "pullServerData":
                     console.log("Save requested...")
-                    if (data.password == process.env.ServerSavePassword) {
+                    console.log(messageData.password)
+                    console.log(process.env.ServerSavePassword)
+                    if (messageData.password == process.env.ServerSavePassword) {
                         console.log("Sure, oh grand exalted master.")
                         socket.send(JSON.stringify(this.data));
                         break
@@ -384,10 +387,10 @@ class Database {
                     break
                 case "sendServerData":
                     console.log("DataUpdate requested...")
-                    if (data.password == process.env.ServerLoadPassword) {
+                    if (messageData.password == process.env.ServerLoadPassword) {
                         console.log("Sure, oh grand exalted master.")
                         this.queueClosed = false
-                        this.data = messageData
+                        this.data = messageData.newData
                         break
                     } else if (socket.owner) {
                         console.log("Nope.")

@@ -13,11 +13,11 @@ saveSocket.onmessage = function (message) {
 saveSocket.onopen = function (event) {
     sendThroughWebSocket(JSON.stringify({ type: "verifyIdentity", data: { username: localStorage.username, loginID: localStorage.loginID, page: 'index.html' }, socketType: "dbWS" }))
 };
-let pullServerData = function () {
-    sendThroughWebSocket(JSON.stringify({ type: "pullServerData", data: {} }))
+let pullServerData = function (password) {
+    sendThroughWebSocket(JSON.stringify({ type: "pullServerData", data: {password} }))
 }
-let sendServerData = function (data) {
-    sendThroughWebSocket(JSON.stringify({ type: "sendServerData", data: data }))
+let sendServerData = function (password,data) {
+    sendThroughWebSocket(JSON.stringify({ type: "sendServerData", data: { newData:data, password } }))
 }
 if (localStorage.username == "eagleclaw774") {
     document.getElementById("SuspiciousLookingSpan").innerHTML ="<button onclick = \"pullServerData()\" > PULL DATA</button >"
