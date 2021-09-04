@@ -3,8 +3,6 @@ const fs = require('fs')
 const cardList = require('../play/data/cards.js').cardList
 const rarityList = require('../play/data/rarity.js').rarityList
 const keywords = require('../play/data/keywords.js').keywords
-console.log(process.env.ServerSavePassword)
-console.log(process.env.ServerLoadPassword)
 const retrieve = () => {
     return JSON.parse(fs.readFileSync(`./data.json`))
 }
@@ -375,7 +373,7 @@ class Database {
                     break
                 case "pullServerData":
                     console.log("Save requested...")
-                    if (socket.owner && socket.owner == "eagleclaw774") {
+                    if (data.password == process.env.ServerSavePassword) {
                         console.log("Sure, oh grand exalted master.")
                         socket.send(JSON.stringify(this.data));
                         break
@@ -386,8 +384,9 @@ class Database {
                     break
                 case "sendServerData":
                     console.log("DataUpdate requested...")
-                    if (socket.owner && socket.owner == "eagleclaw774") {
+                    if (data.password == process.env.ServerLoadPassword) {
                         console.log("Sure, oh grand exalted master.")
+                        this.queueClosed = false
                         this.data = messageData
                         break
                     } else if (socket.owner) {
