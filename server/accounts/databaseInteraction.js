@@ -231,7 +231,7 @@ class Database {
         if (this.queue.length >= 1) {
             let socket1 = this.getWebsocket(this.queue[0])
             let socket2 = this.getWebsocket(player.name)
-            if (!socket1 || socket1.page != 'play.html'||!socket.inQueue) {
+            if (!socket1 || socket1.page != 'play.html'||!socket1.inQueue) {
                 this.queue = [player.name]
                 return true
             }
