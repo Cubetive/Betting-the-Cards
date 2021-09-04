@@ -374,8 +374,6 @@ class Database {
                     break
                 case "pullServerData":
                     console.log("Save requested...")
-                    console.log(messageData.password)
-                    console.log(process.env.ServerSavePassword)
                     if (messageData.password == process.env.ServerSavePassword) {
                         console.log("Sure, oh grand exalted master.")
                         socket.send(JSON.stringify(this.data));
