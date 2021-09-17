@@ -145,7 +145,7 @@ const cardList = {
         },
         onCardCreation: function () {
             //if we've been drawn already, skip.
-             this.listenerReceiver.addEventHandler(
+            this.listenerReceiver.addEventHandler(
                 "TrollingGameStart",
                 () => {
                     if (this.zone != "deck") {
@@ -186,6 +186,41 @@ const cardList = {
         },
         factions: [2, 2],
     },
+    "Token": {
+        origHP: 2,
+        origAttack: 1,
+        baseKeywords: [],
+        geoCost: 0,
+        type: "character",
+        baseText: [{ type: "plainText", value: "This is a token and should not appear in the crafting page." }],
+        imageLink: "",
+        rarity: 101,
+        factions: [2, 2],
+    },
+    "Token Source": {
+        origHP: 5,
+        origAttack: 5,
+        baseKeywords: [],
+        geoCost: 5,
+        type: "character",
+        baseText: [{ type: "plainText", value: "Play: Invoke a " },
+        { type: "cardName", value: "Token", name: "Token" },
+        { type: "plainText", value: "." }],
+        imageLink: "",
+        rarity: 3,
+        performSetup: function () {
+            this.listenerReceiver.addEventHandler(
+                "TokenSourceTriggerPlay",
+                () => { this.play() },
+                ListenerReceiver.genEventFunction("triggerPlayEvents"),
+                this.listenerEmitter
+            )
+        },
+        play: function () {
+            this.player.invokeCharacter("Token");
+        },
+        factions: [2, 2],
+    },
     "Nop dyne": {
         origHP: 3,
         origAttack: 5,
@@ -196,7 +231,7 @@ const cardList = {
         imageLink: "",
         rarity: 3,
         factions: [2, 2],
-        playFromDeckListener:null,
+        playFromDeckListener: null,
         onCardCreation: function () {
             this.playFromDeckListener = this.listenerReceiver.addEventHandler(
                 "NopDynePlayFromDeck",
@@ -352,13 +387,13 @@ const cardList = {
         modifyCardAttackListener: null,
         modifyCardHPListener: null,
         modifyCardKeywordListener: null,
-        removeAuraListener:null,
+        removeAuraListener: null,
         performSetup: function () {
 
             this.modifyCardHPListener = this.listenerReceiver.addEventHandler(
                 "GrubFatherHPListener",
                 (event) => {
-                    if (event.data.card.team == this.team && event.data.card.zone == "board"&&event.data.card!=this) {
+                    if (event.data.card.team == this.team && event.data.card.zone == "board" && event.data.card != this) {
                         return event.modifiable + 1
                     }
                     return null
@@ -391,7 +426,7 @@ const cardList = {
             this.removeAuraListener = this.listenerReceiver.addEventHandler(
                 "GrubFatherRemoveAuras",
                 () => {
-                    if (data.newZone != "board") { 
+                    if (data.newZone != "board") {
                         this.game.listenerEmitter.removeListener(this.removeAuraListener)
                         this.game.listenerEmitter.removeListener(this.modifyCardAttackListener)
                         this.game.listenerEmitter.removeListener(this.modifyCardHPListener)
@@ -535,14 +570,14 @@ const cardList = {
         performSetup: function () {
             this.listenerReceiver.addEventHandler(
                 "SeerTriggerPlay",
-                (event) => {this.play(event.data.target) },
+                (event) => { this.play(event.data.target) },
                 ListenerReceiver.genEventFunction("triggerPlayEvents"),
                 this.listenerEmitter
             )
         },
         play: function (target) {
             if (target != null) {
-                this.player.addAnimation("showTargeted", {targets: this.calcTargets(target)}, 0)
+                this.player.addAnimation("showTargeted", { targets: this.calcTargets(target) }, 0)
                 this.player.addEnemyAnimation("showTargeted", { targets: this.player.flipTargets(this.calcTargets(target)) }, 0)
                 this.player.addAnimation("triggerEffect", { card: this.getSendableCopy() }, 700)
                 this.player.addEnemyAnimation("triggerEffect", { card: this.getSendableCopy() }, 700)
@@ -596,7 +631,7 @@ const cardList = {
     },
     "garbage": {
         origHP: 1,
-        origAttack:0,
+        origAttack: 0,
         baseKeywords: [],
         geoCost: 5,
         type: "character",

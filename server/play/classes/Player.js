@@ -1,3 +1,4 @@
+const cardList = require('../data/cards.js').cardList
 const Card = require('./Card.js').Card
 const ListenerReceiver = require('./ListenerReceiver.js').ListenerReceiver
 const ListenerEmitter = require('./ListenerEmitter.js').ListenerEmitter
@@ -266,7 +267,7 @@ class Player {
         )
         this.animationsToSend = []
     }
-    addAnimation(type, data, time = 0,overrideUpdateCards = false) {
+    addAnimation(type, data, time = 0, overrideUpdateCards = false) {
         if (this.animationsLocked) {
             return
         }
@@ -301,21 +302,21 @@ class Player {
         } else {
             this.animationsToSend.push(animation)
         }
-        if (type != "updateBoardCardData"&&type!="updateHandCardData"&&this.game.started&&!overrideUpdateCards) {
+        if (type != "updateBoardCardData" && type != "updateHandCardData" && this.game.started && !overrideUpdateCards) {
             this.game.checkCardsForUpdates()
         }
     }
     addDualAnimation(type, data, time = 0) {
         this.addAnimation(type, data, time, true)
         let newData = {};
-        if (data.ally!=undefined) {
+        if (data.ally != undefined) {
             for (const [key, value] of Object.entries(data)) {
                 newData[key] = value
             }
             newData.ally = !data.ally
-            this.enemyPlayer.addAnimation(type, newData, time,true)
+            this.enemyPlayer.addAnimation(type, newData, time, true)
         } else {
-            this.enemyPlayer.addAnimation(type, data, time,true)
+            this.enemyPlayer.addAnimation(type, data, time, true)
         }
         if (type != "updateBoardCardData" && type != "updateHandCardData" && this.game.started) {
             this.game.checkCardsForUpdates()
@@ -337,7 +338,7 @@ class Player {
     }
     endTurn() {
         this.addAnimation("endTurn", {}, 0)
-        this.listenerEmitter.emitPassiveEvent({},"triggerTurnEndEvents")
+        this.listenerEmitter.emitPassiveEvent({}, "triggerTurnEndEvents")
     }
     shuffleDeck() {
         util.shuffle(this.deck)
@@ -381,7 +382,7 @@ class Player {
         if (!card.isPlayable) {
             return;
         }
-        if (card.requiresTarget&&!util.targetsEmpty(card.getValidTargets())) {
+        if (card.requiresTarget && !util.targetsEmpty(card.getValidTargets())) {
             this.hand.splice(cardPos, 1)
             this.addAnimation("removeCardHand", { cardPos })
             this.addAnimation("updateAllyCards", { value: this.hand.length })
@@ -407,7 +408,7 @@ class Player {
             this.addEnemyAnimation("updateEnemyCards", { value: this.hand.length })
             this.summonCharacter(card, slotPos, true)
         }
-        this.listenerEmitter.emitPassiveEvent({ card: card },"allyCardPlayed")
+        this.listenerEmitter.emitPassiveEvent({ card: card }, "allyCardPlayed")
     }
     playSpell(cardPos) {
         if (cardPos >= this.hand.length) {
@@ -423,7 +424,7 @@ class Player {
             this.addAnimation("updateAllyCards", { value: this.hand.length })
             this.waitForTargetCancellable(
                 card,
-                 (target) => {
+                (target) => {
                     this.geo -= card.outgoingGeoCost
                     this.soul -= card.outgoingSoulCost
                     this.addAnimation("updateAllyCards", { value: this.hand.length })
@@ -497,6 +498,15 @@ class Player {
         this.addAnimation("addCardHand", { card: card.getSendableCopy() }, 100)
         this.addAnimation("updateAllyCards", { value: this.hand.length }, 0)
         this.addEnemyAnimation("updateEnemyCards", { value: this.hand.length }, 0)
+    }
+    //Invoke - Conjure and Summon
+    invokeCharacter(cardName) {
+        if (!this.hasEmptySlot)
+            return
+        if (cardList[cardName].type != "character")
+            return
+        let card = new Card(cardName, this.id, this.game, "void")
+        this.summonCharacter(card)
     }
     waitForTargetCancellable(card, onTargetChosen, onCancelChoose) {
         let validTargets = card.getValidTargets()
