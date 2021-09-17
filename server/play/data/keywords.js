@@ -12,6 +12,10 @@ const keywords = {
         imgsrclink: '',
         description: 'Characters with taunt have to be attacked before anything else.'
     },
+    "Invoke": {
+        imgsrclink: '',
+        description: 'Create and Summon a character.'
+    },
     "Dream Variant": {
         imgsrclink: '',
         description: 'Certain cards have dream variants. To get the dream variant of a card, use the dream nail on it.'
